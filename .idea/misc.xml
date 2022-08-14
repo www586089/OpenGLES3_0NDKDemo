@@ -4,7 +4,7 @@
     <asm skipDebug="false" skipFrames="false" skipCode="false" expandFrames="false" />
     <groovy codeStyle="LEGACY" />
   </component>
-  <component name="DesignSurface">
+  <component name="DesignSurfacdde">
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/nantian/Android/workspace/20220711/OpenGLES3_0NDKDemo/app/src/main/res/layout/activity_egl.xml" value="0.3463541666666667" />
