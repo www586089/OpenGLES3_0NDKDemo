@@ -17,25 +17,28 @@ import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
 class EGLActivity : AppCompatActivity() {
-    private var mImageView: ImageView? = null
-    private var mBtn: Button? = null
+    private lateinit var mImageView: ImageView
+    private lateinit var mBtn: Button
     private lateinit var mBgRender: NativeEglRender
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_egl)
+
         mImageView = findViewById<View>(R.id.imageView) as ImageView
         mBtn = findViewById<View>(R.id.button) as Button
+
         mBgRender = NativeEglRender()
         mBgRender.nativeEglRenderInit()
-        mBtn!!.setOnClickListener {
-            if (mBtn!!.text == this@EGLActivity.resources.getString(R.string.btn_txt_reset)) {
-                mImageView!!.setImageResource(R.drawable.leg)
-                mBtn!!.setText(R.string.bg_render_txt)
+
+        mBtn.setOnClickListener {
+            if (mBtn.text == this@EGLActivity.resources.getString(R.string.btn_txt_reset)) {
+                mImageView.setImageResource(R.drawable.leg)
+                mBtn.setText(R.string.bg_render_txt)
             } else {
                 startBgRender()
-                mBtn!!.setText(R.string.btn_txt_reset)
+                mBtn.setText(R.string.btn_txt_reset)
             }
         }
     }
@@ -73,25 +76,23 @@ class EGLActivity : AppCompatActivity() {
             else -> {
             }
         }
-        if (mBgRender != null) {
-            mBgRender!!.nativeEglRenderSetIntParams(PARAM_TYPE_SHADER_INDEX, shaderIndex)
-            startBgRender()
-            mBtn!!.setText(R.string.btn_txt_reset)
-        }
+        mBgRender.nativeEglRenderSetIntParams(PARAM_TYPE_SHADER_INDEX, shaderIndex)
+        startBgRender()
+        mBtn.setText(R.string.btn_txt_reset)
         return true
     }
 
     private fun startBgRender() {
         loadRGBAImage(R.drawable.leg, mBgRender)
-        mBgRender!!.nativeEglRenderDraw()
-        mImageView!!.setImageBitmap(createBitmapFromGLSurface(0, 0, 933, 1400))
+        mBgRender.nativeEglRenderDraw()
+        mImageView.setImageBitmap(createBitmapFromGLSurface(0, 0, 933, 1400))
     }
 
     private fun loadRGBAImage(resId: Int, render: NativeEglRender?) {
-        val `is` = this.resources.openRawResource(resId)
+        val inputStream = this.resources.openRawResource(resId)
         val bitmap: Bitmap?
         try {
-            bitmap = BitmapFactory.decodeStream(`is`)
+            bitmap = BitmapFactory.decodeStream(inputStream)
             if (bitmap != null) {
                 val bytes = bitmap.byteCount
                 val buf = ByteBuffer.allocate(bytes)
@@ -101,7 +102,7 @@ class EGLActivity : AppCompatActivity() {
             }
         } finally {
             try {
-                `is`.close()
+                inputStream.close()
             } catch (e: IOException) {
                 e.printStackTrace()
             }

@@ -281,9 +281,9 @@ const char fShaderStr7[] =
 //顶点坐标
 const GLfloat vVertices[] = {
 		-1.0f, -1.0f, 0.0f, // bottom left
-		1.0f, -1.0f, 0.0f, // bottom right
+		 1.0f, -1.0f, 0.0f, // bottom right
 		-1.0f,  1.0f, 0.0f, // top left
-		1.0f,  1.0f, 0.0f, // top right
+		 1.0f,  1.0f, 0.0f, // top right
 };
 
 //正常纹理坐标
@@ -304,8 +304,7 @@ const GLfloat vFboTexCoors[] = {
 
 const GLushort indices[] = { 0, 1, 2, 1, 3, 2 };
 
-EGLRender::EGLRender()
-{
+EGLRender::EGLRender() {
 	m_ImageTextureId = GL_NONE;
 	m_FboTextureId = GL_NONE;
 	m_SamplerLoc = GL_NONE;
@@ -319,25 +318,21 @@ EGLRender::EGLRender()
 	m_ShaderIndex = 0;
 }
 
-EGLRender::~EGLRender()
-{
-	if (m_RenderImage.ppPlane[0])
-	{
+EGLRender::~EGLRender() {
+	if (m_RenderImage.ppPlane[0]) {
 		NativeImageUtil::FreeNativeImage(&m_RenderImage);
 		m_RenderImage.ppPlane[0] = nullptr;
 	}
 
 }
 
-void EGLRender::Init()
-{
+void EGLRender::Init() {
 	LOGE("EGLRender::Init");
-	if (CreateGlesEnv() == 0)
-	{
+	if (CreateGlesEnv() == 0) {
 		m_IsGLContextReady = true;
 	}
 
-	if(!m_IsGLContextReady) return;
+	if (!m_IsGLContextReady) return;
 	m_fShaderStrs[0] = fShaderStr0;
 	m_fShaderStrs[1] = fShaderStr1;
 	m_fShaderStrs[2] = fShaderStr2;
@@ -364,10 +359,8 @@ void EGLRender::Init()
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 
-	m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,
-									 m_FragmentShader);
-	if (!m_ProgramObj)
-	{
+	m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,m_FragmentShader);
+	if (!m_ProgramObj) {
 		CheckGLError("Create Program");
 		LOGE("EGLRender::Init Could not create program.");
 		return;
@@ -397,12 +390,12 @@ void EGLRender::Init()
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
 	glEnableVertexAttribArray(VERTEX_POS_LOC);
-	glVertexAttribPointer(VERTEX_POS_LOC, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void *)0);
+	glVertexAttribPointer(VERTEX_POS_LOC, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),(const void *) 0);
 	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
 	glEnableVertexAttribArray(TEXTURE_POS_LOC);
-	glVertexAttribPointer(TEXTURE_POS_LOC, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (const void *)0);
+	glVertexAttribPointer(TEXTURE_POS_LOC, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),(const void *) 0);
 	glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
@@ -410,45 +403,41 @@ void EGLRender::Init()
 	glBindVertexArray(GL_NONE);
 }
 
-int EGLRender::CreateGlesEnv()
-{
+int EGLRender::CreateGlesEnv() {
 	// EGL config attributes
-    const EGLint confAttr[] =
-    {
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT_KHR,
-            EGL_SURFACE_TYPE,EGL_PBUFFER_BIT,//EGL_WINDOW_BIT EGL_PBUFFER_BIT we will create a pixelbuffer surface
-            EGL_RED_SIZE,   8,
-            EGL_GREEN_SIZE, 8,
-            EGL_BLUE_SIZE,  8,
-            EGL_ALPHA_SIZE, 8,// if you need the alpha channel
-            EGL_DEPTH_SIZE, 16,// if you need the depth buffer
-            EGL_STENCIL_SIZE,8,
-            EGL_NONE
-    };
+	const EGLint confAttr[] = {
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT_KHR,
+			EGL_SURFACE_TYPE,    EGL_PBUFFER_BIT,//EGL_WINDOW_BIT EGL_PBUFFER_BIT we will create a pixelbuffer surface
+			EGL_RED_SIZE,        8,
+			EGL_GREEN_SIZE,      8,
+			EGL_BLUE_SIZE,       8,
+			EGL_ALPHA_SIZE,      8,// if you need the alpha channel
+			EGL_DEPTH_SIZE,      16,// if you need the depth buffer
+			EGL_STENCIL_SIZE,    8,
+			EGL_NONE
+	};
 
 	// EGL context attributes
-    const EGLint ctxAttr[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
-            EGL_NONE
-    };
+	const EGLint ctxAttr[] = {
+			EGL_CONTEXT_CLIENT_VERSION, 2,
+			EGL_NONE
+	};
 
 	// surface attributes
 	// the surface size is set to the input frame size
 	const EGLint surfaceAttr[] = {
 			EGL_WIDTH, 1,
-			EGL_HEIGHT,1,
+			EGL_HEIGHT, 1,
 			EGL_NONE
 	};
 	EGLint eglMajVers, eglMinVers;
 	EGLint numConfigs;
 
 	int resultCode = 0;
-	do
-	{
+	do {
 		//1. 获取 EGLDisplay 对象，建立与本地窗口系统的连接
 		m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-		if(m_eglDisplay == EGL_NO_DISPLAY)
-		{
+		if (m_eglDisplay == EGL_NO_DISPLAY) {
 			//Unable to open connection to local windowing system
 			LOGE("EGLRender::CreateGlesEnv Unable to open connection to local windowing system");
 			resultCode = -1;
@@ -456,8 +445,7 @@ int EGLRender::CreateGlesEnv()
 		}
 
 		//2. 初始化 EGL 方法
-		if(!eglInitialize(m_eglDisplay, &eglMajVers, &eglMinVers))
-		{
+		if (!eglInitialize(m_eglDisplay, &eglMajVers, &eglMinVers)) {
 			// Unable to initialize EGL. Handle and recover
 			LOGE("EGLRender::CreateGlesEnv Unable to initialize EGL");
 			resultCode = -1;
@@ -467,8 +455,7 @@ int EGLRender::CreateGlesEnv()
 		LOGE("EGLRender::CreateGlesEnv EGL init with version %d.%d", eglMajVers, eglMinVers);
 
 		//3. 获取 EGLConfig 对象，确定渲染表面的配置信息
-		if(!eglChooseConfig(m_eglDisplay, confAttr, &m_eglConf, 1, &numConfigs))
-		{
+		if (!eglChooseConfig(m_eglDisplay, confAttr, &m_eglConf, 1, &numConfigs)) {
 			LOGE("EGLRender::CreateGlesEnv some config is wrong");
 			resultCode = -1;
 			break;
@@ -476,10 +463,8 @@ int EGLRender::CreateGlesEnv()
 
 		//4. 创建渲染表面 EGLSurface, 使用 eglCreatePbufferSurface 创建屏幕外渲染区域
 		m_eglSurface = eglCreatePbufferSurface(m_eglDisplay, m_eglConf, surfaceAttr);
-		if(m_eglSurface == EGL_NO_SURFACE)
-		{
-			switch(eglGetError())
-			{
+		if (m_eglSurface == EGL_NO_SURFACE) {
+			switch (eglGetError()) {
 				case EGL_BAD_ALLOC:
 					// Not enough resources available. Handle and recover
 					LOGE("EGLRender::CreateGlesEnv Not enough resources available");
@@ -503,11 +488,9 @@ int EGLRender::CreateGlesEnv()
 
 		//5. 创建渲染上下文 EGLContext
 		m_eglCtx = eglCreateContext(m_eglDisplay, m_eglConf, EGL_NO_CONTEXT, ctxAttr);
-		if(m_eglCtx == EGL_NO_CONTEXT)
-		{
+		if (m_eglCtx == EGL_NO_CONTEXT) {
 			EGLint error = eglGetError();
-			if(error == EGL_BAD_CONFIG)
-			{
+			if (error == EGL_BAD_CONFIG) {
 				// Handle error and recover
 				LOGE("EGLRender::CreateGlesEnv EGL_BAD_CONFIG");
 				resultCode = -1;
@@ -516,32 +499,26 @@ int EGLRender::CreateGlesEnv()
 		}
 
 		//6. 绑定上下文
-		if(!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglCtx))
-		{
+		if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglCtx)) {
 			LOGE("EGLRender::CreateGlesEnv MakeCurrent failed");
 			resultCode = -1;
 			break;
 		}
 		LOGE("EGLRender::CreateGlesEnv initialize success!");
-	}
-	while (false);
+	} while (false);
 
-	if (resultCode != 0)
-	{
+	if (resultCode != 0) {
 		LOGE("EGLRender::CreateGlesEnv fail");
 	}
 
 	return resultCode;
 }
 
-void EGLRender::SetImageData(uint8_t *pData, int width, int height)
-{
+void EGLRender::SetImageData(uint8_t *pData, int width, int height) {
 	LOGE("EGLRender::SetImageData pData = %p, [w,h] = [%d, %d]", pData, width, height);
 
-	if (pData && m_IsGLContextReady)
-	{
-		if (m_RenderImage.ppPlane[0])
-		{
+	if (pData && m_IsGLContextReady) {
+		if (m_RenderImage.ppPlane[0]) {
 			NativeImageUtil::FreeNativeImage(&m_RenderImage);
 			m_RenderImage.ppPlane[0] = nullptr;
 		}
@@ -556,8 +533,7 @@ void EGLRender::SetImageData(uint8_t *pData, int width, int height)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_RenderImage.ppPlane[0]);
 		glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-		if (m_FboId == GL_NONE)
-		{
+		if (m_FboId == GL_NONE) {
 			// Create FBO
 			glGenFramebuffers(1, &m_FboId);
 			glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
@@ -575,27 +551,20 @@ void EGLRender::SetImageData(uint8_t *pData, int width, int height)
 
 }
 
-void EGLRender::SetIntParams(int paramType, int param)
-{
+void EGLRender::SetIntParams(int paramType, int param) {
 	LOGE("EGLRender::SetIntParams paramType = %d, param = %d", paramType, param);
-	switch (paramType)
-	{
-		case PARAM_TYPE_SHADER_INDEX:
-		{
-			if (param >= 0)
-			{
+	switch (paramType) {
+		case PARAM_TYPE_SHADER_INDEX: {
+			if (param >= 0) {
 				m_ShaderIndex = param % EGL_FEATURE_NUM;
 
-				if (m_ProgramObj)
-				{
+				if (m_ProgramObj) {
 					glDeleteProgram(m_ProgramObj);
 					m_ProgramObj = GL_NONE;
 				}
 
-				m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,
-													  m_FragmentShader);
-				if (!m_ProgramObj)
-				{
+				m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex],m_VertexShader, m_FragmentShader);
+				if (!m_ProgramObj) {
 					CheckGLError("Create Program");
 					LOGE("EGLRender::SetIntParams Could not create program.");
 					return;
@@ -614,8 +583,7 @@ void EGLRender::SetIntParams(int paramType, int param)
 	}
 }
 
-void EGLRender::Draw()
-{
+void EGLRender::Draw() {
 	LOGE("EGLRender::Draw");
 	if (m_ProgramObj == GL_NONE) return;
 	glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
@@ -649,29 +617,24 @@ void EGLRender::Draw()
 
 }
 
-void EGLRender::UnInit()
-{
+void EGLRender::UnInit() {
 	LOGE("EGLRender::UnInit");
-	if (m_ProgramObj)
-	{
+	if (m_ProgramObj) {
 		glDeleteProgram(m_ProgramObj);
 		m_ProgramObj = GL_NONE;
 	}
 
-	if (m_ImageTextureId)
-	{
+	if (m_ImageTextureId) {
 		glDeleteTextures(1, &m_ImageTextureId);
 		m_ImageTextureId = GL_NONE;
 	}
 
-	if (m_FboTextureId)
-	{
+	if (m_FboTextureId) {
 		glDeleteTextures(1, &m_FboTextureId);
 		m_FboTextureId = GL_NONE;
 	}
 
-	if (m_VboIds[0])
-	{
+	if (m_VboIds[0]) {
 		glDeleteBuffers(3, m_VboIds);
 		m_VboIds[0] = GL_NONE;
 		m_VboIds[1] = GL_NONE;
@@ -679,29 +642,25 @@ void EGLRender::UnInit()
 
 	}
 
-	if (m_VaoIds[0])
-	{
+	if (m_VaoIds[0]) {
 		glDeleteVertexArrays(1, m_VaoIds);
 		m_VaoIds[0] = GL_NONE;
 	}
 
-	if (m_FboId)
-	{
+	if (m_FboId) {
 		glDeleteFramebuffers(1, &m_FboId);
 		m_FboId = GL_NONE;
 	}
 
 
-	if (m_IsGLContextReady)
-	{
+	if (m_IsGLContextReady) {
 		DestroyGlesEnv();
 		m_IsGLContextReady = false;
 	}
 
 }
 
-void EGLRender::DestroyGlesEnv()
-{
+void EGLRender::DestroyGlesEnv() {
 	//8. 释放 EGL 环境
 	if (m_eglDisplay != EGL_NO_DISPLAY) {
 		eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);

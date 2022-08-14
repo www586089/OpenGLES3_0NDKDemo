@@ -41,8 +41,8 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
-        render/EGLRender.h
-        render/EGLRender.cpp
+#        render/EGLRender.h
+#        render/EGLRender.cpp
 #        sample/FBOSample.h
 #        sample/FBOSample.cpp
 #        Opengles3_0ndk.cpp
