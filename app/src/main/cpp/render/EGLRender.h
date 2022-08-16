@@ -22,7 +22,7 @@ public:
 
     void Init();
 
-    int CreateGlesEnv();
+    int CreateEGLEnv();
 
     //void CreateProgramWithFeedback(const char *vShaderStr, const char *fShaderStr);
 

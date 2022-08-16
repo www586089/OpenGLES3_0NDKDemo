@@ -63,14 +63,14 @@ void MyGLRenderContext::onDrawFrame() {
     LOGE("MyGLRenderContext::onDrawFrame");
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    if (pPreviousSample) {
+    if (nullptr != pPreviousSample) {
         LOGE("MyGLRenderContext::onDrawFrame--->destroy previous sample");
         pPreviousSample->destroy();
         delete pPreviousSample;
         pPreviousSample = nullptr;
     }
 
-    if (pCurrentSample) {
+    if (nullptr != pCurrentSample) {
         LOGE("MyGLRenderContext::onDrawFrame------> draw current");
         pCurrentSample->init();
         pCurrentSample->draw(mScreenWidth, mScreenHeight);

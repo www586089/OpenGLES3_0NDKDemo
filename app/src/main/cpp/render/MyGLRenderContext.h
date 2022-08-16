@@ -34,8 +34,8 @@ public :
 
 private:
     static MyGLRenderContext *m_pContext;
-    GLSampleBase *pPreviousSample;
-    GLSampleBase *pCurrentSample;
+    GLSampleBase *pPreviousSample = nullptr;
+    GLSampleBase *pCurrentSample = nullptr;
     int mScreenWidth;
     int mScreenHeight;
 };

@@ -2,7 +2,7 @@ package com.zfang.opengles3_0ndk.egl
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.opengl.GLES20
+import android.opengl.GLES30.*
 import android.opengl.GLException
 import android.os.Bundle
 import android.view.Menu
@@ -109,22 +109,19 @@ class EGLActivity : AppCompatActivity() {
         }
     }
 
-    private fun createBitmapFromGLSurface(x: Int, y: Int, w: Int, h: Int): Bitmap? {
-        val bitmapBuffer = IntArray(w * h)
-        val bitmapSource = IntArray(w * h)
+    private fun createBitmapFromGLSurface(left: Int, top: Int, width: Int, height: Int): Bitmap? {
+        val bitmapBuffer = IntArray(width * height)
+        val bitmapSource = IntArray(width * height)
         val intBuffer = IntBuffer.wrap(bitmapBuffer)
         intBuffer.position(0)
         try {
-            GLES20.glReadPixels(
-                x, y, w, h, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
-                intBuffer
-            )
+            glReadPixels(left, top, width, height, GL_RGBA, GL_UNSIGNED_BYTE, intBuffer)
             var offset1: Int
             var offset2: Int
-            for (i in 0 until h) {
-                offset1 = i * w
-                offset2 = (h - i - 1) * w
-                for (j in 0 until w) {
+            for (i in 0 until height) {
+                offset1 = i * width
+                offset2 = (height - i - 1) * width
+                for (j in 0 until width) {
                     val texturePixel = bitmapBuffer[offset1 + j]
                     val blue = texturePixel shr 16 and 0xff
                     val red = texturePixel shl 16 and 0x00ff0000
@@ -135,7 +132,7 @@ class EGLActivity : AppCompatActivity() {
         } catch (e: GLException) {
             return null
         }
-        return Bitmap.createBitmap(bitmapSource, w, h, Bitmap.Config.ARGB_8888)
+        return Bitmap.createBitmap(bitmapSource, width, height, Bitmap.Config.ARGB_8888)
     }
 
     companion object {

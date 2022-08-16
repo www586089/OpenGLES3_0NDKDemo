@@ -23,16 +23,16 @@ const char vShaderStr[] =
 		"   gl_Position = a_position;               \n"
 		"   v_texCoord = a_texCoord;                \n"
 		"}                                          \n";
-
+// 普通渲染
 const char fShaderStr0[] =
-		"#version 300 es\n"
-		"precision mediump float;\n"
-		"in vec2 v_texCoord;\n"
-		"layout(location = 0) out vec4 outColor;\n"
-		"uniform sampler2D s_TextureMap;\n"
-		"void main()\n"
-		"{\n"
-		"    outColor = texture(s_TextureMap, v_texCoord);\n"
+		"#version 300 es                                      \n"
+		"precision mediump float;                             \n"
+		"in vec2 v_texCoord;                                  \n"
+		"layout(location = 0) out vec4 outColor;              \n"
+		"uniform sampler2D s_TextureMap;                      \n"
+		"void main()                                          \n"
+		"{                                                    \n"
+		"    outColor = texture(s_TextureMap, v_texCoord);    \n"
 		"}";
 // 马赛克
 const char fShaderStr1[] =
@@ -87,8 +87,8 @@ const char fShaderStr2[] =
 		"    float radius = size * 0.5;\n"
 		"    vec2 fragCoord = v_texCoord * u_texSize.xy;\n"
 		"    vec2 quadPos = floor(fragCoord.xy / size) * size;\n"
-		"    vec2 quad = quadPos/u_texSize.xy;\n"
-		"    vec2 quadCenter = (quadPos + size/2.0);\n"
+		"    vec2 quad = quadPos / u_texSize.xy;\n"
+		"    vec2 quadCenter = (quadPos + size / 2.0);\n"
 		"    float dist = length(quadCenter - fragCoord.xy);\n"
 		"\n"
 		"    if (dist > radius) {\n"
@@ -328,7 +328,7 @@ EGLRender::~EGLRender() {
 
 void EGLRender::Init() {
 	LOGE("EGLRender::Init");
-	if (CreateGlesEnv() == 0) {
+	if (CreateEGLEnv() == 0) {
 		m_IsGLContextReady = true;
 	}
 
@@ -403,7 +403,7 @@ void EGLRender::Init() {
 	glBindVertexArray(GL_NONE);
 }
 
-int EGLRender::CreateGlesEnv() {
+int EGLRender::CreateEGLEnv() {
 	// EGL config attributes
 	const EGLint confAttr[] = {
 			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT_KHR,
@@ -439,7 +439,7 @@ int EGLRender::CreateGlesEnv() {
 		m_eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 		if (m_eglDisplay == EGL_NO_DISPLAY) {
 			//Unable to open connection to local windowing system
-			LOGE("EGLRender::CreateGlesEnv Unable to open connection to local windowing system");
+			LOGE("EGLRender::CreateEGLEnv Unable to open connection to local windowing system");
 			resultCode = -1;
 			break;
 		}
@@ -447,16 +447,16 @@ int EGLRender::CreateGlesEnv() {
 		//2. 初始化 EGL 方法
 		if (!eglInitialize(m_eglDisplay, &eglMajVers, &eglMinVers)) {
 			// Unable to initialize EGL. Handle and recover
-			LOGE("EGLRender::CreateGlesEnv Unable to initialize EGL");
+			LOGE("EGLRender::CreateEGLEnv Unable to initialize EGL");
 			resultCode = -1;
 			break;
 		}
 
-		LOGE("EGLRender::CreateGlesEnv EGL init with version %d.%d", eglMajVers, eglMinVers);
+		LOGE("EGLRender::CreateEGLEnv EGL init with version %d.%d", eglMajVers, eglMinVers);
 
 		//3. 获取 EGLConfig 对象，确定渲染表面的配置信息
 		if (!eglChooseConfig(m_eglDisplay, confAttr, &m_eglConf, 1, &numConfigs)) {
-			LOGE("EGLRender::CreateGlesEnv some config is wrong");
+			LOGE("EGLRender::CreateEGLEnv some config is wrong");
 			resultCode = -1;
 			break;
 		}
@@ -467,21 +467,21 @@ int EGLRender::CreateGlesEnv() {
 			switch (eglGetError()) {
 				case EGL_BAD_ALLOC:
 					// Not enough resources available. Handle and recover
-					LOGE("EGLRender::CreateGlesEnv Not enough resources available");
+					LOGE("EGLRender::CreateEGLEnv Not enough resources available");
 					break;
 				case EGL_BAD_CONFIG:
 					// Verify that provided EGLConfig is valid
-					LOGE("EGLRender::CreateGlesEnv provided EGLConfig is invalid");
+					LOGE("EGLRender::CreateEGLEnv provided EGLConfig is invalid");
 					break;
 				case EGL_BAD_PARAMETER:
 					// Verify that the EGL_WIDTH and EGL_HEIGHT are
 					// non-negative values
-					LOGE("EGLRender::CreateGlesEnv provided EGL_WIDTH and EGL_HEIGHT is invalid");
+					LOGE("EGLRender::CreateEGLEnv provided EGL_WIDTH and EGL_HEIGHT is invalid");
 					break;
 				case EGL_BAD_MATCH:
 					// Check window and EGLConfig attributes to determine
 					// compatibility and pbuffer-texture parameters
-					LOGE("EGLRender::CreateGlesEnv Check window and EGLConfig attributes");
+					LOGE("EGLRender::CreateEGLEnv Check window and EGLConfig attributes");
 					break;
 			}
 		}
@@ -492,7 +492,7 @@ int EGLRender::CreateGlesEnv() {
 			EGLint error = eglGetError();
 			if (error == EGL_BAD_CONFIG) {
 				// Handle error and recover
-				LOGE("EGLRender::CreateGlesEnv EGL_BAD_CONFIG");
+				LOGE("EGLRender::CreateEGLEnv EGL_BAD_CONFIG");
 				resultCode = -1;
 				break;
 			}
@@ -500,15 +500,15 @@ int EGLRender::CreateGlesEnv() {
 
 		//6. 绑定上下文
 		if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglCtx)) {
-			LOGE("EGLRender::CreateGlesEnv MakeCurrent failed");
+			LOGE("EGLRender::CreateEGLEnv MakeCurrent failed");
 			resultCode = -1;
 			break;
 		}
-		LOGE("EGLRender::CreateGlesEnv initialize success!");
+		LOGE("EGLRender::CreateEGLEnv initialize success!");
 	} while (false);
 
 	if (resultCode != 0) {
-		LOGE("EGLRender::CreateGlesEnv fail");
+		LOGE("EGLRender::CreateEGLEnv fail");
 	}
 
 	return resultCode;
