@@ -41,6 +41,8 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
+#        sample/FBOLegLengthenSample.h
+#        sample/FBOLegLengthenSample.cpp
 #        render/EGLRender.h
 #        render/EGLRender.cpp
 #        sample/FBOSample.h
