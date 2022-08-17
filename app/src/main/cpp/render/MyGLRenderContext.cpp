@@ -10,6 +10,7 @@
 #include <GeometryInstanced.h>
 #include <FBOSample.h>
 #include <FBOLegLengthenSample.h>
+#include <CoordinateSystemSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -110,9 +111,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_TYPE_KEY_FBO_LEG_LENGTHEN:
                 pCurrentSample = new FBOLegLengthenSample();
                 break;
-//            case SAMPLE_TYPE_KEY_COORD_SYSTEM:
-//                pCurrentSample = new CoordSystemSample();
-//                break;
+            case SAMPLE_TYPE_KEY_COORD_SYSTEM:
+                pCurrentSample = new CoordinateSystemSample();
+                break;
 //            case SAMPLE_TYPE_KEY_BASIC_LIGHTING:
 //                pCurrentSample = new BasicLightingSample();
 //                break;

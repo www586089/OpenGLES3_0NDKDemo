@@ -41,6 +41,8 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
+#        sample/CoordinateSystemSample.h
+#        sample/CoordinateSystemSample.cpp
 #        sample/FBOLegLengthenSample.h
 #        sample/FBOLegLengthenSample.cpp
 #        render/EGLRender.h
