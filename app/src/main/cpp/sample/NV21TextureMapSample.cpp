@@ -75,7 +75,7 @@ void NV21TextureMapSample::init() {
             "}                                                   \n";
 
     // Load the shaders and get a linked program object
-    m_ProgramObj= CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj= GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
     // Get the sampler location
     m_ySamplerLoc = glGetUniformLocation (m_ProgramObj, "y_texture" );

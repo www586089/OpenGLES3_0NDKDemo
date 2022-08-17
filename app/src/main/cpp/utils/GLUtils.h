@@ -6,12 +6,19 @@
 #ifndef STUDIOTEST_GLUTILS_H
 #define STUDIOTEST_GLUTILS_H
 
-GLuint LoadShader(GLenum shaderType, const char *pSource);
+class GLUtils {
+public:
+    static GLuint LoadShader(GLenum shaderType, const char *pSource);
 
-GLuint CreateProgram(const char *pVertexShaderSource, const char *pFragShaderSource,
-                           unsigned int &vertexShaderHandle, unsigned int &fragShaderHandle);
+    static GLuint CreateProgram(const char *pVertexShaderSource, const char *pFragShaderSource,
+                                unsigned int &vertexShaderHandle, unsigned int &fragShaderHandle);
 
-void DeleteProgram(unsigned int &program);
+    static void DeleteProgram(unsigned int &program);
+
+//    static void CheckGLError(const char *pGLOperation);
+//    static void GO_CHECK_GL_ERROR();
+
+};
 
 void CheckGLError(const char *pGLOperation);
 void GO_CHECK_GL_ERROR();

@@ -94,7 +94,7 @@ void GeometryInstanced::init() {
         0.0f, 1.0f, 0.0f,
         0.0f, 1.0f, 1.0f
     };
-    m_ProgramObj = CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
     for (int i = 0; i < amount; i++) {
         randNumbers.push_back(getRandomReal(min, max) * amountSqrt);

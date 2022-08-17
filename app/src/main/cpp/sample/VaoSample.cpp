@@ -85,7 +85,7 @@ void VaoSample::init() {
     // Index buffer data
     GLushort indices[6] = {0, 1, 2, 0, 2, 3};
 
-    m_ProgramObj = CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
     // Generate VBO Ids and load the VBOs with data
     glGenBuffers(2, m_VboIds);

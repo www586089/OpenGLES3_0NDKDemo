@@ -14,7 +14,7 @@ void GO_CHECK_GL_ERROR() {
 
 }
 
-GLuint LoadShader(GLenum shaderType, const char *pSource) {
+GLuint GLUtils::LoadShader(GLenum shaderType, const char *pSource) {
     GLuint shader = 0;
     shader = glCreateShader(shaderType);
     if (shader) {
@@ -40,7 +40,7 @@ GLuint LoadShader(GLenum shaderType, const char *pSource) {
     return shader;
 }
 
-GLuint CreateProgram(const char *pVertexShaderSource,
+ GLuint GLUtils::CreateProgram(const char *pVertexShaderSource,
                      const char *pFragShaderSource,
                      GLuint &vertexShaderHandle,
                      GLuint &fragShaderHandle) {
@@ -87,7 +87,7 @@ GLuint CreateProgram(const char *pVertexShaderSource,
     return program;
 }
 
-void DeleteProgram(GLuint &program) {
+void GLUtils::DeleteProgram(GLuint &program) {
     LOGE("GLUtils::DeleteProgram");
     if (program) {
         glUseProgram(0);

@@ -359,7 +359,7 @@ void EGLRender::Init() {
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 
-	m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,m_FragmentShader);
+	m_ProgramObj = GLUtils::CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex], m_VertexShader,m_FragmentShader);
 	if (!m_ProgramObj) {
 		CheckGLError("Create Program");
 		LOGE("EGLRender::Init Could not create program.");
@@ -563,7 +563,7 @@ void EGLRender::SetIntParams(int paramType, int param) {
 					m_ProgramObj = GL_NONE;
 				}
 
-				m_ProgramObj = CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex],m_VertexShader, m_FragmentShader);
+				m_ProgramObj = GLUtils::CreateProgram(vShaderStr, m_fShaderStrs[m_ShaderIndex],m_VertexShader, m_FragmentShader);
 				if (!m_ProgramObj) {
 					CheckGLError("Create Program");
 					LOGE("EGLRender::SetIntParams Could not create program.");

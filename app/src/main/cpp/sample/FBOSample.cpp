@@ -103,10 +103,10 @@ void FBOSample::init() {
             "}"; // 输出灰度图
 
     // 编译链接用于普通渲染的着色器程序
-    m_ProgramObj = CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
     // 编译链接用于离屏渲染的着色器程序
-    m_FboProgramObj = CreateProgram(vShaderStr, fFboShaderStr, m_FboVertexShader, m_FboFragmentShader);
+    m_FboProgramObj = GLUtils::CreateProgram(vShaderStr, fFboShaderStr, m_FboVertexShader, m_FboFragmentShader);
 
     if (m_ProgramObj == GL_NONE || m_FboProgramObj == GL_NONE) {
         LOGE("FBOSample::Init m_ProgramObj == GL_NONE");

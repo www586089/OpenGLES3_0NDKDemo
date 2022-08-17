@@ -494,9 +494,9 @@ void FBOLegLengthenSample::init() {
     m_MVPMatrix = Projection * View * Model;
 
 
-    m_ProgramObj = CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
 
-    m_FboProgramObj = CreateProgram(vFboShaderStr, fFboShaderStr, m_FboVertexShader,
+    m_FboProgramObj = GLUtils::CreateProgram(vFboShaderStr, fFboShaderStr, m_FboVertexShader,
                                     m_FboFragmentShader);
 
     if (m_ProgramObj == GL_NONE || m_FboProgramObj == GL_NONE) {

@@ -48,7 +48,7 @@ void TextureMapSample::init() {
             "  //outColor = texelFetch(s_TextureMap,  ivec2(int(v_texCoord.x * 404.0), int(v_texCoord.y * 336.0)), 0);\n"
             "}                                                   \n";
 
-    m_ProgramObj = CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
     if (m_ProgramObj) {
         mSamplerLocation = glGetUniformLocation(m_ProgramObj, "s_TextureMap");
     } else{
