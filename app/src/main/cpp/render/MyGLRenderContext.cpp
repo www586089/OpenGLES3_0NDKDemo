@@ -11,6 +11,7 @@
 #include <FBOSample.h>
 #include <FBOLegLengthenSample.h>
 #include <CoordinateSystemSample.h>
+#include <BasicLightingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -114,9 +115,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_TYPE_KEY_COORD_SYSTEM:
                 pCurrentSample = new CoordinateSystemSample();
                 break;
-//            case SAMPLE_TYPE_KEY_BASIC_LIGHTING:
-//                pCurrentSample = new BasicLightingSample();
-//                break;
+            case SAMPLE_TYPE_KEY_BASIC_LIGHTING:
+                pCurrentSample = new BasicLightingSample();
+                break;
 //            case SAMPLE_TYPE_KEY_TRANSFORM_FEEDBACK:
 //                pCurrentSample = new TransformFeedbackSample();
 //                break;
@@ -242,6 +243,14 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
         LOGE("MyGLRenderContext::SetParamsInt pPreviousSample = %p, pCurrentSample=%p", pPreviousSample, pCurrentSample);
     }
 }
+
+void MyGLRenderContext::updateTransformMatrix(float rotateX, float rotateY, float scaleX,float scaleY) {
+    LOGE("MyGLRenderContext::UpdateTransformMatrix [rotateX, rotateY, scaleX, scaleY] = [%f, %f, %f, %f]", rotateX, rotateY, scaleX, scaleY);
+    if (nullptr != pCurrentSample) {
+        pCurrentSample->updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+    }
+}
+
 
 MyGLRenderContext *MyGLRenderContext::GetInstance() {
     LOGE("MyGLRenderContext::GetInstance");

@@ -73,6 +73,18 @@ Java_com_zfang_opengles3_10ndk_MyNativeRender_nativeSetParamsInt(JNIEnv *env, jo
                                                                  jint second) {
     MyGLRenderContext::GetInstance()->setParamsInt(type, first, second);
 }
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_zfang_opengles3_10ndk_MyNativeRender_updateTransformMatrix(JNIEnv *env, jobject thiz,
+                                                                    jfloat rotate_x,
+                                                                    jfloat rotate_y, jfloat scale_x,
+                                                                    jfloat scale_y) {
+    MyGLRenderContext::GetInstance()->updateTransformMatrix(rotate_x, rotate_y, scale_x, scale_y);
+}
+
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_zfang_opengles3_10ndk_egl_NativeEglRender_nativeEglRenderInit(JNIEnv *env, jobject thiz) {

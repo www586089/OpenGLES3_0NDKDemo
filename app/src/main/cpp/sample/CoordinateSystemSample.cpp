@@ -131,14 +131,15 @@ void CoordinateSystemSample::loadImage(NativeImage *pImage) {
     }
 
 }
+
 float angleX = 0;
 void CoordinateSystemSample::draw(int screenW, int screenH) {
     LOGE("CoordinateSystemSample::Draw()");
 
     if (m_ProgramObj == GL_NONE || m_TextureId == GL_NONE) return;
 
-    angleX += 0.1f;
-    updateTransformMatrix(angleX, 0, 1.0, 1.0);
+//    angleX += 0.1f;
+//    updateTransformMatrix(angleX, 0, 1.0, 1.0);
     LOGE("CoordinateSystemSample::Draw(), m_AngleX = %i, m_AngleY = %i", m_AngleX, m_AngleY);
     UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
 

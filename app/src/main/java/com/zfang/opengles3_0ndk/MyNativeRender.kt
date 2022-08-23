@@ -13,7 +13,7 @@ val SAMPLE_TYPE_EGL = SAMPLE_TYPE_FBO + 1
 val SAMPLE_TYPE_FBO_LEG = SAMPLE_TYPE_EGL + 1
 val SAMPLE_TYPE_COORD_SYSTEM = SAMPLE_TYPE_FBO_LEG + 1
 val SAMPLE_TYPE_BASIC_LIGHTING = SAMPLE_TYPE_COORD_SYSTEM + 1
-val SAMPLE_TYPE_TRANS_FEEDBACK = SAMPLE_TYPE + 9
+val SAMPLE_TYPE_TRANS_FEEDBACK = SAMPLE_TYPE_BASIC_LIGHTING + 1
 val SAMPLE_TYPE_MULTI_LIGHTS = SAMPLE_TYPE + 10
 val SAMPLE_TYPE_DEPTH_TESTING = SAMPLE_TYPE + 11
 val SAMPLE_TYPE_INSTANCING = SAMPLE_TYPE + 12
@@ -79,4 +79,11 @@ class MyNativeRender {
     external fun native_OnDrawFrame()
 
     external fun nativeSetParamsInt(type: Int, first: Int, second: Int)
+
+    external fun updateTransformMatrix(
+        rotateX: Float,
+        rotateY: Float,
+        scaleX: Float,
+        scaleY: Float
+    )
 }

@@ -28,6 +28,7 @@ public :
     void onDrawFrame();
 
     void setParamsInt(int type, int first, int second);
+    void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
 
     static MyGLRenderContext *GetInstance();
     static void DestroyInstance();
