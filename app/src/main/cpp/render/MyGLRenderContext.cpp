@@ -12,6 +12,7 @@
 #include <FBOLegLengthenSample.h>
 #include <CoordinateSystemSample.h>
 #include <BasicLightingSample.h>
+#include <TransformFeedbackSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -118,9 +119,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_TYPE_KEY_BASIC_LIGHTING:
                 pCurrentSample = new BasicLightingSample();
                 break;
-//            case SAMPLE_TYPE_KEY_TRANSFORM_FEEDBACK:
-//                pCurrentSample = new TransformFeedbackSample();
-//                break;
+            case SAMPLE_TYPE_KEY_TRANSFORM_FEEDBACK:
+                pCurrentSample = new TransformFeedbackSample();
+                break;
 //            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
 //                pCurrentSample = new MultiLightsSample();
 //                break;

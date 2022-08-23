@@ -22,7 +22,6 @@ public:
     virtual void destroy();
 
     bool CreateFrameBufferObj();
-    void GO_CHECK_GL_ERROR() {}
 
 private:
     GLuint m_ImageTextureId;
