@@ -5,6 +5,7 @@
 #include "../sample/NV21TextureMapSample.h"
 #include "../sample/VaoSample.h"
 #include "../sample/VBOSample.h"
+#include "../learnog/LightingColorSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -53,7 +54,6 @@ void MyGLRenderContext::setImageData(int format, int width, int height, uint8_t 
 void MyGLRenderContext::onSurfaceCreated() {
     LOGE("MyGLRenderContext::onSurfaceCreated");
     glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
-    mSample.init();
 }
 
 void MyGLRenderContext::onSurfaceChanged(int width, int height) {
@@ -121,6 +121,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_TYPE_KEY_TRANSFORM_FEEDBACK:
                 pCurrentSample = new TransformFeedbackSample();
+                break;
+            case SAMPLE_LEARN_OG_COLOR:
+                pCurrentSample = new LightingColorSample();
                 break;
 //            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
 //                pCurrentSample = new MultiLightsSample();

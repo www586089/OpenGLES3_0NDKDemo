@@ -24,6 +24,7 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/base/*.cpp
         ${CMAKE_SOURCE_DIR}/render/*.cpp
         ${CMAKE_SOURCE_DIR}/sample/*.cpp
+        ${CMAKE_SOURCE_DIR}/learnog/*.cpp
         ${CMAKE_SOURCE_DIR}/utils/*.cpp)
 
 # Creates and names a library, sets it as either STATIC
@@ -41,6 +42,9 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
+        learnog/Camera.h
+
+        learnog/LightingSampleBase.cpp
 #        sample/CoordinateSystemSample.h
 #        sample/CoordinateSystemSample.cpp
 #        sample/FBOLegLengthenSample.h

@@ -9,15 +9,6 @@
 
 class MyGLRenderContext {
 public :
-    TriangleSample mSample;
-    //TextureMapSample* m_TextureSample;
-    NativeImage m_NativeImage;
-
-//    static int const IMAGE_FORMAT_RGBA = 0x01;
-//    static int const IMAGE_FORMAT_NV21 = 0x02;
-//    static int const IMAGE_FORMAT_NV12 = 0x03;
-//    static int const IMAGE_FORMAT_I420 = 0x04;
-
     MyGLRenderContext();
     ~MyGLRenderContext();
 
