@@ -43,6 +43,7 @@ add_library(
         # Provides a relative path to your source file(s).
         ${src-files}
         learnog/Camera.h
+        learnog/Shader.h
 
         learnog/LightingSampleBase.cpp
 #        sample/CoordinateSystemSample.h

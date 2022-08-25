@@ -6,18 +6,29 @@
 #define OPENGLES3_0NDKDEMO_LIGHTINGSAMPLEBASE_H
 
 #include <GLSampleBase.h>
+#include "Shader.h"
 
 class LightingSampleBase: public GLSampleBase {
 
+public:
+    LightingSampleBase() {
+
+    }
+    virtual ~LightingSampleBase() {
+
+    }
+
 protected:
-    GLuint lightingShader;
-    GLuint lightCubeShader;
+    Shader lightingShader;
+    Shader lightCubeShader;
     unsigned int VBO, cubeVAO;
     unsigned int lightCubeVAO;
 
-    GLint modelLocation;
-    GLint viewLocation;
-    GLint projectionLocation;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+
+    glm::mat4 mvpMatrix;
 };
 
 

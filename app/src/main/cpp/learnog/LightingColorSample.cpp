@@ -7,11 +7,9 @@
 #include <gtc/matrix_transform.hpp>
 #include "../utils/GLUtils.h"
 #include "Camera.h"
+#include "Shader.h"
 
 LightingColorSample::LightingColorSample() {
-
-    lightingShader = GL_NONE;
-    lightCubeShader = GL_NONE;
     VBO = GL_NONE;
     lightCubeVAO = GL_NONE;
 
@@ -19,8 +17,6 @@ LightingColorSample::LightingColorSample() {
 }
 
 LightingColorSample::~LightingColorSample() {
-    lightingShader = GL_NONE;
-    lightCubeShader = GL_NONE;
     VBO = GL_NONE;
     lightCubeVAO = GL_NONE;
 
@@ -28,12 +24,12 @@ LightingColorSample::~LightingColorSample() {
 }
 
 void LightingColorSample::init() {
-    if (GL_NONE != lightingShader) {
+    if (lightingShader.isAvailable()) {
         return;
     }
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float r = 0.2f;
+    float r = 0.4f;
     GLfloat vertices[] = {
             -r, -r, -r,
              r, -r, -r,
@@ -77,6 +73,7 @@ void LightingColorSample::init() {
             -r,  r,  r,
             -r,  r, -r,
     };
+
     char lightingVShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
@@ -101,7 +98,6 @@ void LightingColorSample::init() {
             "{                                                       \n"
             "    FragColor = vec4(lightColor * objectColor, 1.0);    \n"
             "}";
-
     char lightingCubeVShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
@@ -122,10 +118,10 @@ void LightingColorSample::init() {
             "{                                                                \n"
             "    FragColor = vec4(1.0); // set alle 4 vector values to 1.0    \n"
             "}";
-    lightingShader = GLUtils::CreateProgram(lightingVShaderStr, lightingFShaderStr, m_VertexShader, m_FragmentShader);
-    lightCubeShader = GLUtils::CreateProgram(lightingCubeVShaderStr, lightingCubeFShaderStr, m_VertexShader, m_FragmentShader);
+    lightingShader = Shader(lightingVShaderStr, lightingFShaderStr);
+    lightCubeShader = Shader(lightingCubeVShaderStr, lightingCubeFShaderStr);
 
-    if (lightingShader && lightCubeShader) {
+    if (lightingShader.isAvailable() && lightCubeShader.isAvailable()) {
         // first, configure the cube's VAO (and VBO)
         glGenVertexArrays(1, &cubeVAO);
         glGenBuffers(1, &VBO);
@@ -156,7 +152,7 @@ void LightingColorSample::init() {
 void LightingColorSample::draw(int screenW, int screenH) {
     LOGE("LightingColorSample::Draw()");
 
-    if (lightingShader == GL_NONE || lightCubeShader == GL_NONE) {
+    if (!lightingShader.isAvailable() || !lightCubeShader.isAvailable()) {
         LOGE("LightingColorSample::Draw() return");
         return;
     }
@@ -169,48 +165,31 @@ void LightingColorSample::draw(int screenW, int screenH) {
     // camera
     Camera camera(glm::vec3(0.0f, 0.0f, .0f));
     // lighting
-    glm::vec3 lightPos(1.0f, 1.6f, 1.0f);
-
-    // be sure to activate shader when setting uniforms/drawing objects
-    glUseProgram(lightingShader);
-    GLint objectColorLocation = glGetUniformLocation(lightingShader, "objectColor");
-    glUniform3f(objectColorLocation, 1.0f, 0.5f, 0.31f);
-    GLint lightColorLocation = glGetUniformLocation(lightingShader, "lightColor");
-    glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
+    glm::vec3 lightPos(2.8f, 2.8f, 1.0f);
 
 
     int angleX = m_AngleX;
     int angleY = m_AngleY;
     angleX = angleX % 360;
     angleY = angleY % 360;
-
-
     //转化为弧度角
     float radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
     float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
 
     // view/projection transformations
-    glm::mat4 projection = glm::perspective(45.0f, (float) screenW / (float) screenH, 0.1f, 100.0f);
-    // View matrix
-    glm::vec3 eyePosition = glm::vec3 (1.0f, 1.5f, 3.0f);
-    glm::vec3 center = glm::vec3 (0, 0, 0);
-    glm::vec3 upHeader = glm::vec3 (0, 1, 0);
-    glm::mat4 view = glm::lookAt(
-            eyePosition,   // Camera is at (0,0,1), in World Space
-            center,        // and looks at the origin
-            upHeader       // Head is up (set to 0,-1,0 to look upside-down)
-    );
-    // view/projection transformations
-    GLint projectionLocation = glGetUniformLocation(lightingShader, "projection");
-    GLint viewLocation = glGetUniformLocation(lightingShader, "view");
-    glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
-    glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
+    UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
+    // be sure to activate shader when setting uniforms/drawing objects
+    lightingShader.use();
+    lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
     // world transformation
-    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    GLint modelLocation = glGetUniformLocation((GLint) lightingShader, "model");
-    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, &model[0][0]);
+    lightingShader.setMat4("model", model);
+    // view/projection transformations
+    lightingShader.setMat4("projection", projection);
+    lightingShader.setMat4("view", view);
 
     // render the cube
     glBindVertexArray(cubeVAO);
@@ -219,20 +198,15 @@ void LightingColorSample::draw(int screenW, int screenH) {
 
 
     // also draw the lamp object
-    glUseProgram(lightCubeShader);
-    projectionLocation = glGetUniformLocation(lightCubeShader, "projection");
-    viewLocation = glGetUniformLocation(lightCubeShader, "view");
-    glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
-    glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
-
+    lightCubeShader.use();
     // lighting
     model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
     model = glm::translate(model, lightPos);
-
-    modelLocation = glGetUniformLocation(lightCubeShader, "model");
-    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, &model[0][0]);
+    lightCubeShader.setMat4("model", model);
+    lightCubeShader.setMat4("view", view);
+    lightCubeShader.setMat4("projection", projection);
 
     glBindVertexArray(lightCubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -240,9 +214,9 @@ void LightingColorSample::draw(int screenW, int screenH) {
 }
 
 void LightingColorSample::destroy() {
-    if (GL_NONE != lightingShader) {
-        glDeleteProgram(lightingShader);
-        glDeleteProgram(lightCubeShader);
+    if (lightingShader.isAvailable()) {
+        lightingShader.deleteProgram();
+        lightCubeShader.deleteProgram();
 
         glDeleteBuffers(1, &VBO);
         glDeleteVertexArrays(1, &cubeVAO);
@@ -258,37 +232,19 @@ void LightingColorSample::destroy() {
  * */
 void LightingColorSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
     LOGE("LightingColorSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
-    angleX = angleX % 360;
-    angleY = angleY % 360;
-
-    //转化为弧度角
-    float radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
-    float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
-
-
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.0f, 100.0f);
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
-    glm::mat4 Projection = glm::perspective(45.0f, ratio, 0.1f, 100.f);
-
+    projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
     // View matrix
-    glm::vec3 eyePosition = glm::vec3 (2, 2, 2);
+    glm::vec3 eyePosition = glm::vec3 (1.0f, 2.5f, 3.0f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
-    glm::mat4 View = glm::lookAt(
+    view = glm::lookAt(
             eyePosition,   // Camera is at (0,0,1), in World Space
             center,        // and looks at the origin
             upHeader       // Head is up (set to 0,-1,0 to look upside-down)
     );
-
-    // Model matrix
-    glm::mat4 Model = glm::mat4(1.0f);
-    Model = glm::scale(Model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
-    Model = glm::rotate(Model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
-    Model = glm::rotate(Model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
-
-    mvpMatrix = Projection * View * Model;
 }
 
 void LightingColorSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
