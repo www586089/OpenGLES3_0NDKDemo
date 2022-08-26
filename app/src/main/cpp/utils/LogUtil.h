@@ -22,6 +22,12 @@ static long long GetSysCurrentTime() {
     return curTime;
 }
 
+static long GetSysCurrentTimeSec() {
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    return time.tv_usec;
+}
+
 #define FUN_BEGIN_TIME(FUN) {\
     LOGE("%s:%s func start", __FILE__, FUN); \
     long long t0 = GetSysCurrentTime();
