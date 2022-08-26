@@ -2,8 +2,8 @@
 // Created by ByteFlow on 2019/7/17.
 //
 
-#ifndef NDK_OPENGLES_3_0_BGRENDER_H
-#define NDK_OPENGLES_3_0_BGRENDER_H
+#ifndef OPENGLES3_0NDKDEMO_BGRENDER_H
+#define OPENGLES3_0NDKDEMO_BGRENDER_H
 #include "stdint.h"
 #include <GLES3/gl3.h>
 #include <ImageDef.h>
@@ -80,4 +80,4 @@ private:
 };
 
 
-#endif //NDK_OPENGLES_3_0_BGRENDER_H
+#endif //OPENGLES3_0NDKDEMO_BGRENDER_H

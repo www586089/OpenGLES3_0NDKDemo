@@ -7,6 +7,7 @@
 #include "../sample/VBOSample.h"
 #include "../learnog/LightingColorSample.h"
 #include "../learnog/PhongLightBasicSample.h"
+#include "../learnog/PhongMaterialsSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -129,6 +130,8 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_LEARN_PHONG_BASIC:
                 pCurrentSample = new PhongLightBasicSample();
                 break;
+            case SAMPLE_LEARN_PHONG_MATERIALS:
+                pCurrentSample = new PhongMaterialsSample();
                 break;
 //            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
 //                pCurrentSample = new MultiLightsSample();
