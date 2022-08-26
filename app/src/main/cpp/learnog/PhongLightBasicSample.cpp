@@ -234,7 +234,7 @@ void PhongLightBasicSample::draw(int screenW, int screenH) {
 
     // world transformation
     model = glm::mat4(1.0f);
-//    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
     lightingShader.setMat4("model", model);
     // view/projection transformations
     lightingShader.setMat4("projection", projection);
