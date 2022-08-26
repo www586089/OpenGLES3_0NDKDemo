@@ -21,12 +21,15 @@ public:
 protected:
     Shader lightingShader;
     Shader lightCubeShader;
-    unsigned int VBO, cubeVAO;
-    unsigned int lightCubeVAO;
+    GLuint VBO, cubeVAO;
+    GLuint lightCubeVAO;
 
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
+
+    glm::vec3 eyePosition;
+    glm::vec3 lightPos;
 
     glm::mat4 mvpMatrix;
 };
