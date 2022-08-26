@@ -21,7 +21,7 @@ public:
 protected:
     Shader lightingShader;
     Shader lightCubeShader;
-    GLuint VBO, normalVBO, cubeVAO;
+    GLuint VBO, cubeVAO;
     GLuint lightCubeVAO;
     GLuint m_TransFeedbackObjId;
     GLuint m_TransFeedbackBufId;
