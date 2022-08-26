@@ -26,6 +26,35 @@ public:
     }
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
+    Shader(const char *vShaderCode, const char *fShaderCode, GLchar const **varying, int varyingCount) {
+        // 1. retrieve the vertex/fragment source code from filePath
+        // 2. compile shaders
+        unsigned int vertex, fragment;
+        // vertex shader
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glCompileShader(vertex);
+        checkCompileErrors(vertex, "VERTEX");
+        // fragment Shader
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment, 1, &fShaderCode, NULL);
+        glCompileShader(fragment);
+        checkCompileErrors(fragment, "FRAGMENT");
+        // shader Program
+        ID = glCreateProgram();
+        glAttachShader(ID, vertex);
+        glAttachShader(ID, fragment);
+
+        //transform feedback glTransformFeedbackVaryings 需要在 glLinkProgram 之前调用
+        glTransformFeedbackVaryings(ID, varyingCount, varying, GL_INTERLEAVED_ATTRIBS);
+        GO_CHECK_GL_ERROR();
+
+        glLinkProgram(ID);
+        checkCompileErrors(ID, "PROGRAM");
+        // delete the shaders as they're linked into our program now and no longer necessery
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+    }
     Shader(const char *vShaderCode, const char *fShaderCode) {
         // 1. retrieve the vertex/fragment source code from filePath
 //        std::string vertexCode;

@@ -21,8 +21,10 @@ public:
 protected:
     Shader lightingShader;
     Shader lightCubeShader;
-    GLuint VBO, cubeVAO;
+    GLuint VBO, normalVBO, cubeVAO;
     GLuint lightCubeVAO;
+    GLuint m_TransFeedbackObjId;
+    GLuint m_TransFeedbackBufId;
 
     glm::mat4 model;
     glm::mat4 view;
