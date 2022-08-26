@@ -95,42 +95,46 @@ void PhongMaterialsSample::init() {
 
     char lightingFShaderStr[] =
             "#version 300 es                                         \n"
-            "struct Material {\n"
-            "    vec3 ambient;\n"
-            "    vec3 diffuse;\n"
-            "    vec3 specular;\n"
-            "    float shininess;\n"
-            "}; "
+            "struct Material {                                       \n"
+            "    vec3 ambient;                                       \n"
+            "    vec3 diffuse;                                       \n"
+            "    vec3 specular;                                      \n"
+            "    float shininess;                                    \n"
+            "};                                                      \n"
+            "struct Light {                                          \n"
+            "    vec3 position;                                      \n"
+            "                                                        \n"
+            "    vec3 ambient;                                       \n"
+            "    vec3 diffuse;                                       \n"
+            "    vec3 specular;                                      \n"
+            "};                                                      \n"
             "out vec4 FragColor;                                     \n"
             "                                                        \n"
             "uniform vec3 objectColor;                               \n"
-            "uniform vec3 lightColor;                                \n"
-            "uniform vec3 lightPos;                                  \n"
             "uniform vec3 viewPos;                                   \n"
-            "uniform Material material;\n"
+            "uniform Material material;                              \n"
+            "uniform Light light;                                    \n"
             "                                                        \n"
             "in vec3 FragPos;                                        \n"
             "in vec3 Normal;                                         \n"
             "                                                        \n"
             "void main()                                             \n"
             "{                                                       \n"
-            "    float ambientStrength = 0.1;                        \n"
-            "    vec3 ambient = lightColor * material.ambient;        \n"
+            "    vec3 ambient = light.ambient * material.ambient;    \n"
             "                                                        \n"
             "    vec3 normal = normalize(Normal);                    \n"
-            "    vec3 lightDir = normalize(lightPos - FragPos);      \n"
+            "    vec3 lightDir = normalize(light.position - FragPos);\n"
             "    float diff = max(dot(normal, lightDir), 0.0);       \n"
-            "    vec3 diffuse = material.diffuse * diff * lightColor;                   \n"
-            "                                                        \n"
-            "    float specularStrength = 0.5;                       \n"
-            "    vec3 viewDir = normalize(viewPos - FragPos);                   \n"
-            "    vec3 reflectDir = reflect(-lightDir, normal);                  \n"
+            "    vec3 diffuse = light.diffuse * (material.diffuse * diff);                     \n"
+            "                                                                                  \n"
+            "    vec3 viewDir = normalize(viewPos - FragPos);                                  \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                                 \n"
             "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);    \n"
-            "    vec3 specular =  material.specular * spec * lightColor;          \n"
-            "                                                                   \n"
-            "    vec3 result = (ambient + diffuse + specular) * objectColor;    \n"
-            "    FragColor = vec4(result, 1.0);                                 \n"
-            "}\n"
+            "    vec3 specular =  light.specular * (material.specular * spec);                 \n"
+            "                                                                                  \n"
+            "    vec3 result = (ambient + diffuse + specular) * objectColor;                   \n"
+            "    FragColor = vec4(result, 1.0);                                                \n"
+            "}                                                                                 \n"
             ;
 
     char lightingCubeVShaderStr[] =
@@ -235,14 +239,17 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
     // be sure to activate shader when setting uniforms/drawing objects
     lightingShader.use();
     lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3("lightPos", lightPos);
     lightingShader.setVec3("viewPos", eyePosition);
     // set materials
     lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
     lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
     lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     lightingShader.setFloat("material.shininess", 32.0f);
+    // set Light
+    lightingShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    lightingShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setVec3("light.position", lightPos);
 
     // world transformation
     model = glm::mat4(1.0f);
