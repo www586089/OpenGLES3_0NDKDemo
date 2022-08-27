@@ -98,11 +98,11 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
 
     private lateinit var mGLSurfaceView: MyGLSurfaceView
     private lateinit var mRootView: ViewGroup
-    private var mSampleSelectedIndex: Int = SAMPLE_TYPE_KEY_BEATING_HEART - SAMPLE_TYPE
+    private val defaultSampleType = SAMPLE_TYPE_TRIANGLE - SAMPLE_TYPE
+    private var mSampleSelectedIndex: Int = defaultSampleType
     private lateinit var mAudioCollector: AudioCollector
     private val mGLRender: MyGLRender = MyGLRender()
     private var mSensorManager: SensorManager? = null
-    private val defaultSampleType = SAMPLE_TYPE_TRIANGLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,6 +111,19 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         mRootView.viewTreeObserver.addOnGlobalLayoutListener(this)
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         mGLRender.init()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+//            initDefaultSample()
+        }
+    }
+
+    private fun initDefaultSample() {
+        supportActionBar?.title = SAMPLE_TITLES[mSampleSelectedIndex]
+        mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY)
+        mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0)
     }
 
     override fun onGlobalLayout() {
@@ -156,7 +169,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         confirmBtn.setOnClickListener { dialog.cancel() }
         val resolutionsListView: RecyclerView = rootView.findViewById(R.id.resolution_list_view)
         val myPreviewSizeViewAdapter = MyRecyclerViewAdapter(this, SAMPLE_TITLES)
-        myPreviewSizeViewAdapter.setSelectIndex(mSampleSelectedIndex)
+        myPreviewSizeViewAdapter.selectIndex = mSampleSelectedIndex
 
         myPreviewSizeViewAdapter.addOnItemClickListener(object :
             MyRecyclerViewAdapter.OnItemClickListener {
@@ -173,6 +186,8 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                 myPreviewSizeViewAdapter.notifyItemChanged(selectIndex)
                 myPreviewSizeViewAdapter.notifyItemChanged(position)
                 mSampleSelectedIndex = position
+                supportActionBar?.title = SAMPLE_TITLES[mSampleSelectedIndex]
+
                 mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY)
                 if (mRootView.getWidth() != mGLSurfaceView.getWidth()
                     || mRootView.getHeight() != mGLSurfaceView.getHeight()
