@@ -42,10 +42,6 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
-        learnog/Camera.h
-        learnog/PhongMaterialsSample.h
-
-        learnog/PhongMaterialsSample.cpp
 #        sample/CoordinateSystemSample.h
 #        sample/CoordinateSystemSample.cpp
 #        sample/FBOLegLengthenSample.h
