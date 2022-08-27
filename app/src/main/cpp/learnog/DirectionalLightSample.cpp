@@ -1,28 +1,33 @@
 //
-// Created by Thinkpad on 2022/8/26.
+// Created by Thinkpad on 2022/8/27.
 //
 
-#include "PhongMaterialsSample.h"
+#include "DirectionalLightSample.h"
 #include <gtc/matrix_transform.hpp>
 #include "../utils/GLUtils.h"
 #include "Camera.h"
 #include "Shader.h"
 
-PhongMaterialsSample::PhongMaterialsSample() {
+#include <gtc/matrix_transform.hpp>
+#include "../utils/GLUtils.h"
+#include "Camera.h"
+#include "Shader.h"
+
+DirectionalLightSample::DirectionalLightSample() {
     VBO = GL_NONE;
     lightCubeVAO = GL_NONE;
 
     cubeVAO = GL_NONE;
 }
 
-PhongMaterialsSample::~PhongMaterialsSample() {
+DirectionalLightSample::~DirectionalLightSample() {
     VBO = GL_NONE;
     lightCubeVAO = GL_NONE;
 
     cubeVAO = GL_NONE;
 }
 
-void PhongMaterialsSample::init() {
+void DirectionalLightSample::init() {
     if (lightingShader.isAvailable()) {
         return;
     }
@@ -30,54 +35,55 @@ void PhongMaterialsSample::init() {
     // ------------------------------------------------------------------
     GLfloat r = 0.5f;
     GLfloat vertices[] = {
-            //vertex     normal
-            -r, -r, -r,  0.0f,  0.0f, -1.0f,
-             r, -r, -r,  0.0f,  0.0f, -1.0f,
-             r,  r, -r,  0.0f,  0.0f, -1.0f,
-             r,  r, -r,  0.0f,  0.0f, -1.0f,
-            -r,  r, -r,  0.0f,  0.0f, -1.0f,
-            -r, -r, -r,  0.0f,  0.0f, -1.0f,
+            //vertex     normal               // texture coord
+            -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+             r, -r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+            -r,  r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+            -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-            -r, -r,  r,  0.0f,  0.0f,  1.0f,
-             r, -r,  r,  0.0f,  0.0f,  1.0f,
-             r,  r,  r,  0.0f,  0.0f,  1.0f,
-             r,  r,  r,  0.0f,  0.0f,  1.0f,
-            -r,  r,  r,  0.0f,  0.0f,  1.0f,
-            -r, -r,  r,  0.0f,  0.0f,  1.0f,
+            -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+             r, -r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+            -r,  r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+            -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
 
-            -r,  r,  r, -1.0f,  0.0f,  0.0f,
-            -r,  r, -r, -1.0f,  0.0f,  0.0f,
-            -r, -r, -r, -1.0f,  0.0f,  0.0f,
-            -r, -r, -r, -1.0f,  0.0f,  0.0f,
-            -r, -r,  r, -1.0f,  0.0f,  0.0f,
-            -r,  r,  r, -1.0f,  0.0f,  0.0f,
+            -r,  r,  r, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+            -r,  r, -r, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+            -r, -r, -r, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -r, -r, -r, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -r, -r,  r, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+            -r,  r,  r, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-             r,  r,  r,  1.0f,  0.0f,  0.0f,
-             r,  r, -r,  1.0f,  0.0f,  0.0f,
-             r, -r, -r,  1.0f,  0.0f,  0.0f,
-             r, -r, -r,  1.0f,  0.0f,  0.0f,
-             r, -r,  r,  1.0f,  0.0f,  0.0f,
-             r,  r,  r,  1.0f,  0.0f,  0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+             r,  r, -r,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             r, -r,  r,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-            -r, -r, -r,  0.0f, -1.0f,  0.0f,
-             r, -r, -r,  0.0f, -1.0f,  0.0f,
-             r, -r,  r,  0.0f, -1.0f,  0.0f,
-             r, -r,  r,  0.0f, -1.0f,  0.0f,
-            -r, -r,  r,  0.0f, -1.0f,  0.0f,
-            -r, -r, -r,  0.0f, -1.0f,  0.0f,
+            -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+             r, -r, -r,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+            -r, -r,  r,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+            -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-            -r,  r, -r,  0.0f,  1.0f,  0.0f,
-             r,  r, -r,  0.0f,  1.0f,  0.0f,
-             r,  r,  r,  0.0f,  1.0f,  0.0f,
-             r,  r,  r,  0.0f,  1.0f,  0.0f,
-            -r,  r,  r,  0.0f,  1.0f,  0.0f,
-            -r,  r, -r,  0.0f,  1.0f,  0.0f,
+            -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+             r,  r, -r,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+            -r,  r,  r,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+            -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
     char lightingVShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
             "layout (location = 1) in vec3 aNormal;                            \n"
+            "layout (location = 2) in vec2 aTexCoords;\n"
             "                                                                  \n"
             "uniform mat4 model;                                               \n"
             "uniform mat4 view;                                                \n"
@@ -85,23 +91,25 @@ void PhongMaterialsSample::init() {
             "                                                                  \n"
             "out vec3 FragPos;                                                 \n"
             "out vec3 Normal;                                                  \n"
+            "out vec2 TexCoords;\n"
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
             "    FragPos = vec3(model * vec4(aPos, 1.0));                      \n"
             "    gl_Position = projection * view * vec4(FragPos, 1.0);         \n"
             "    Normal = aNormal;                                             \n"
+            "    TexCoords = aTexCoords;\n"
             "}";
 
     char lightingFShaderStr[] =
             "#version 300 es                                         \n"
             "struct Material {                                       \n"
-            "    vec3 ambient;                                       \n"
-            "    vec3 diffuse;                                       \n"
-            "    vec3 specular;                                      \n"
+            "    sampler2D  diffuse;                                       \n"
+            "    sampler2D specular;                                      \n"
             "    float shininess;                                    \n"
             "};                                                      \n"
             "struct Light {                                          \n"
+            "    //vec3 direction;\n"
             "    vec3 position;                                      \n"
             "                                                        \n"
             "    vec3 ambient;                                       \n"
@@ -117,25 +125,27 @@ void PhongMaterialsSample::init() {
             "                                                        \n"
             "in vec3 FragPos;                                        \n"
             "in vec3 Normal;                                         \n"
+            "in vec2 TexCoords;\n"
             "                                                        \n"
             "void main()                                             \n"
             "{                                                       \n"
-            "    vec3 ambient = light.ambient * material.ambient;    \n"
+            "    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;    \n"
             "                                                        \n"
             "    vec3 normal = normalize(Normal);                    \n"
             "    vec3 lightDir = normalize(light.position - FragPos);\n"
+            "    //vec3 lightDir = normalize(-light.direction);\n"
             "    float diff = max(dot(normal, lightDir), 0.0);       \n"
-            "    vec3 diffuse = light.diffuse * (material.diffuse * diff);                     \n"
+            "    vec3 diffuse = light.diffuse * (texture(material.diffuse, TexCoords).rgb * diff);                     \n"
             "                                                                                  \n"
             "    vec3 viewDir = normalize(viewPos - FragPos);                                  \n"
             "    vec3 reflectDir = reflect(-lightDir, normal);                                 \n"
             "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);    \n"
-            "    vec3 specular =  light.specular * (material.specular * spec);                 \n"
+            "    vec3 specular =  light.specular * (texture(material.specular, TexCoords).rgb * spec);                 \n"
             "                                                                                  \n"
-            "    vec3 result = (ambient + diffuse + specular) * objectColor;                   \n"
+            "    vec3 result = (ambient + diffuse + specular);                   \n"
             "    FragColor = vec4(result, 1.0);                                                \n"
             "}                                                                                 \n"
-            ;
+    ;
 
     char lightingCubeVShaderStr[] =
             "#version 300 es                                                   \n"
@@ -181,6 +191,25 @@ void PhongMaterialsSample::init() {
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
+        // Config Diffuse Map
+        glGenTextures(1, &textureDiffuse);
+        glBindTexture(GL_TEXTURE_2D, textureDiffuse);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+
+        // Config Specular Map
+        glGenTextures(1, &textureSpecular);
+        glBindTexture(GL_TEXTURE_2D, textureSpecular);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
         // first, configure the cube's VAO (and VBO)
         glGenVertexArrays(1, &cubeVAO);
         glBindVertexArray(cubeVAO);
@@ -188,11 +217,15 @@ void PhongMaterialsSample::init() {
         // position attribute
         glEnableVertexAttribArray(0);
         GLuint offset = 0;
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*) (offset * sizeof(GLfloat)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof(GLfloat)));
         // normal attribute
         glEnableVertexAttribArray(1);
         offset += 3;
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*) (offset * sizeof (GLfloat)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof (GLfloat)));
+        //texture coordinate
+        glEnableVertexAttribArray(2);
+        offset += 3;
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof (GLfloat)));
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
 
@@ -202,26 +235,48 @@ void PhongMaterialsSample::init() {
         // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it;
         // the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*) 0);
+        offset = 0;
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof(GLfloat)));
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
     } else {
-        LOGE("PhongMaterialsSample::Init create program fail");
+        LOGE("DirectionalLightSample::Init create program fail");
         return;
     }
 }
 
 
+void DirectionalLightSample::loadImage(NativeImage *pImage) {
+    LOGE("DirectionalLightSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+    if (pImage) {
+        diffuseImage.width = pImage->width;
+        diffuseImage.height = pImage->height;
+        diffuseImage.format = pImage->format;
+        NativeImageUtil::CopyNativeImage(pImage, &diffuseImage);
+    }
+}
 
-void PhongMaterialsSample::draw(int screenW, int screenH) {
-    LOGE("PhongMaterialsSample::Draw()");
+void DirectionalLightSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
+    LOGE("DirectionalLightSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+    if (pImage) {
+        if (0 == index) {
+            specularImage.width = pImage->width;
+            specularImage.height = pImage->height;
+            specularImage.format = pImage->format;
+            NativeImageUtil::CopyNativeImage(pImage, &specularImage);
+        }
+    }
+}
+
+void DirectionalLightSample::draw(int screenW, int screenH) {
+    LOGE("DirectionalLightSample::Draw()");
 
     if (!lightingShader.isAvailable() || !lightCubeShader.isAvailable()) {
-        LOGE("PhongMaterialsSample::Draw() return");
+        LOGE("DirectionalLightSample::Draw() return");
         return;
     }
-    LOGE("PhongMaterialsSample::Do Draw()");
+    LOGE("DirectionalLightSample::Do Draw()");
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -243,7 +298,7 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
     // set materials
     lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
     lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+//    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     lightingShader.setFloat("material.shininess", 32.0f);
     // set Light
     glm::vec3 lightColor;
@@ -252,8 +307,8 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
     lightColor.z = static_cast<float>(sin(radiansY * 1.3));
     glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f); // decrease the influence
     glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-    lightingShader.setVec3("light.ambient",  ambientColor/*0.2f, 0.2f, 0.2f*/);
-    lightingShader.setVec3("light.diffuse",  diffuseColor/*0.5f, 0.5f, 0.5f*/); // darken diffuse light a bit
+    lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
+    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.5f, 0.5f, 0.5f); // darken diffuse light a bit
     lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
     lightingShader.setVec3("light.position", lightPos);
 
@@ -265,8 +320,28 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
     lightingShader.setMat4("projection", projection);
     lightingShader.setMat4("view", view);
 
+    //upload RGBA image data Diffuse
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureDiffuse);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseImage.width, diffuseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseImage.ppPlane[0]);
+    glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+    //upload RGBA image data Specular
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, specularImage.width, specularImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, specularImage.ppPlane[0]);
+    glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
     // render the cube
     glBindVertexArray(cubeVAO);
+    // Bind the RGBA map
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureDiffuse);
+    lightingShader.setInt("material.diffuse", 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+    lightingShader.setInt("material.specular", 1);
+
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TransFeedbackObjId);
     glBeginTransformFeedback(GL_TRIANGLES);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -280,7 +355,7 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
 
     float *p = (float*) rawData;
     for(int i= 0; i < 36; i++) {
-        LOGE("PhongMaterialsSample::Draw() read feedback buffer Normal[%d] = [%f, %f, %f]",
+        LOGE("DirectionalLightSample::Draw() read feedback buffer Normal[%d] = [%f, %f, %f]",
              i, p[i * 3], p[i * 3 + 1], p[i * 3 + 2]);
     }
 
@@ -302,7 +377,7 @@ void PhongMaterialsSample::draw(int screenW, int screenH) {
     glBindVertexArray(GL_NONE);
 }
 
-void PhongMaterialsSample::destroy() {
+void DirectionalLightSample::destroy() {
     if (lightingShader.isAvailable()) {
         lightingShader.deleteProgram();
         lightCubeShader.deleteProgram();
@@ -310,6 +385,8 @@ void PhongMaterialsSample::destroy() {
         glDeleteBuffers(1, &VBO);
         glDeleteVertexArrays(1, &cubeVAO);
         glDeleteVertexArrays(1, &lightCubeVAO);
+        glDeleteTextures(1, &textureDiffuse);
+        glDeleteTextures(1, &textureSpecular);
     }
 }
 
@@ -319,8 +396,8 @@ void PhongMaterialsSample::destroy() {
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void PhongMaterialsSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
-    LOGE("PhongMaterialsSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+void DirectionalLightSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
+    LOGE("DirectionalLightSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.0f, 100.0f);
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
@@ -330,7 +407,7 @@ void PhongMaterialsSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int
     float lightZ = 2.8f * cos(radiansY);
     lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
     // View matrix
-    eyePosition = glm::vec3 (1.2f, 2.5f, 2.0f);
+    eyePosition = glm::vec3 (1.6f, 3.0f, 2.0f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
@@ -340,7 +417,7 @@ void PhongMaterialsSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int
     );
 }
 
-void PhongMaterialsSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
+void DirectionalLightSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
     GLSampleBase::updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     m_AngleX = static_cast<int>(rotateX);
     m_AngleY = static_cast<int>(rotateY);

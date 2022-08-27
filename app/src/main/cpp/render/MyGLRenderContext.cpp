@@ -9,6 +9,7 @@
 #include "../learnog/PhongLightBasicSample.h"
 #include "../learnog/PhongMaterialsSample.h"
 #include "../learnog/PhongLightTextureSample.h"
+#include "../learnog/DirectionalLightSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -163,6 +164,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_LEARN_PHONG_TEXTURE:
                 pCurrentSample = new PhongLightTextureSample();
+                break;
+            case SAMPLE_LEARN_LIGHT_DIRECTIONAL:
+                pCurrentSample = new DirectionalLightSample();
                 break;
 //            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
 //                pCurrentSample = new MultiLightsSample();

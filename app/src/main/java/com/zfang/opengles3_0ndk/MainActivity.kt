@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Learn OpenGL Phong Basic",
         "Learn OpenGL Materials",
         "Learn OpenGL Diffuse Texture",
+        "Learn OpenGL Directional Light",
         "Complex Lighting",
         "Depth Testing",
         "Instancing",
@@ -193,12 +194,12 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_TYPE_FBO_LEG -> loadRGBAImage(R.drawable.leg)
                     SAMPLE_TYPE_EGL -> startActivity(Intent(this@MainActivity, EGLActivity::class.java))
                     SAMPLE_TYPE_COORD_SYSTEM, SAMPLE_TYPE_BASIC_LIGHTING, SAMPLE_LEARN_OG_COLOR, SAMPLE_LEARN_PHONG_BASIC,
-                    SAMPLE_LEARN_PHONG_MATERIALS, SAMPLE_LEARN_PHONG_TEXTURE,
+                    SAMPLE_LEARN_PHONG_MATERIALS, SAMPLE_LEARN_PHONG_TEXTURE, SAMPLE_LEARN_LIGHT_DIRECTIONAL,
                     SAMPLE_TYPE_TRANS_FEEDBACK, SAMPLE_TYPE_MULTI_LIGHTS,
                     SAMPLE_TYPE_DEPTH_TESTING, SAMPLE_TYPE_INSTANCING,
                     SAMPLE_TYPE_STENCIL_TESTING -> {
                         loadRGBAImage(R.drawable.texture_diffuse)
-                        if (SAMPLE_LEARN_PHONG_TEXTURE == sampleType) {
+                        if (sampleType in (SAMPLE_LEARN_PHONG_TEXTURE..SAMPLE_LEARN_LIGHT_DIRECTIONAL)) {
                             loadRGBAImage(R.drawable.texture_specular, 0)
                         }
                     }
