@@ -16,6 +16,7 @@ public:
     virtual ~PhongLightTextureSample();
 
     virtual void init();
+    virtual void loadImage(NativeImage *pImage);
     virtual void draw(int screenW, int screenH);
 
     virtual void destroy();

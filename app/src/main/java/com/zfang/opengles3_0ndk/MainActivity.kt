@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_LEARN_PHONG_MATERIALS, SAMPLE_LEARN_PHONG_TEXTURE,
                     SAMPLE_TYPE_TRANS_FEEDBACK, SAMPLE_TYPE_MULTI_LIGHTS,
                     SAMPLE_TYPE_DEPTH_TESTING, SAMPLE_TYPE_INSTANCING,
-                    SAMPLE_TYPE_STENCIL_TESTING -> loadRGBAImage(R.drawable.board_texture)
+                    SAMPLE_TYPE_STENCIL_TESTING -> loadRGBAImage(R.drawable.texture_2)
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)
                         loadRGBAImage(R.drawable.floor, 1)

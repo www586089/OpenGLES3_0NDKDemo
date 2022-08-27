@@ -34,6 +34,10 @@ protected:
     glm::vec3 lightPos;
 
     glm::mat4 mvpMatrix;
+
+    NativeImage m_RenderImage;
+    GLuint textureDiffuse;  //漫反射贴图
+    GLuint textureSpecular;//高光贴图
 };
 
 
