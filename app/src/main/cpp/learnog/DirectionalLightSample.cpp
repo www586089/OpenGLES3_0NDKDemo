@@ -33,7 +33,7 @@ void DirectionalLightSample::init() {
     }
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    GLfloat r = 0.5f;
+    GLfloat r = 0.3f;
     GLfloat vertices[] = {
             //vertex     normal               // texture coord
             -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
@@ -104,13 +104,13 @@ void DirectionalLightSample::init() {
     char lightingFShaderStr[] =
             "#version 300 es                                         \n"
             "struct Material {                                       \n"
-            "    sampler2D  diffuse;                                       \n"
-            "    sampler2D specular;                                      \n"
+            "    sampler2D  diffuse;                                 \n"
+            "    sampler2D specular;                                 \n"
             "    float shininess;                                    \n"
             "};                                                      \n"
             "struct Light {                                          \n"
-            "    //vec3 direction;\n"
-            "    vec3 position;                                      \n"
+            "    vec3 direction;                                     \n"
+            "    //vec3 position;                                    \n"
             "                                                        \n"
             "    vec3 ambient;                                       \n"
             "    vec3 diffuse;                                       \n"
@@ -132,8 +132,8 @@ void DirectionalLightSample::init() {
             "    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;    \n"
             "                                                        \n"
             "    vec3 normal = normalize(Normal);                    \n"
-            "    vec3 lightDir = normalize(light.position - FragPos);\n"
-            "    //vec3 lightDir = normalize(-light.direction);\n"
+            "    //vec3 lightDir = normalize(light.position - FragPos);\n"
+            "    vec3 lightDir = normalize(-light.direction);\n"
             "    float diff = max(dot(normal, lightDir), 0.0);       \n"
             "    vec3 diffuse = light.diffuse * (texture(material.diffuse, TexCoords).rgb * diff);                     \n"
             "                                                                                  \n"
@@ -167,8 +167,7 @@ void DirectionalLightSample::init() {
             "{                                                                \n"
             "    FragColor = vec4(1.0); // set alle 4 vector values to 1.0    \n"
             "}";
-    GLchar const * varyings[] = {"Normal"};
-    lightingShader = Shader(lightingVShaderStr, lightingFShaderStr, varyings, sizeof(varyings) / sizeof(varyings[0]));
+    lightingShader = Shader(lightingVShaderStr, lightingFShaderStr);
     lightCubeShader = Shader(lightingCubeVShaderStr, lightingCubeFShaderStr);
 
     if (lightingShader.isAvailable() && lightCubeShader.isAvailable()) {
@@ -308,9 +307,10 @@ void DirectionalLightSample::draw(int screenW, int screenH) {
     glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f); // decrease the influence
     glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
     lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
-    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.75f, 0.75f, 0.75f); // darken diffuse light a bit
     lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3("light.position", lightPos);
+    lightingShader.setVec3("light.direction", 0.0f, -1.0f, 0.0f);//-0.2f, -1.0f, -0.3f
+    //lightingShader.setVec3("light.position", lightPos);
 
     // world transformation
     model = glm::mat4(1.0f);
@@ -327,7 +327,7 @@ void DirectionalLightSample::draw(int screenW, int screenH) {
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
     //upload RGBA image data Specular
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, textureSpecular);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, specularImage.width, specularImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, specularImage.ppPlane[0]);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
@@ -342,39 +342,45 @@ void DirectionalLightSample::draw(int screenW, int screenH) {
     glBindTexture(GL_TEXTURE_2D, textureSpecular);
     lightingShader.setInt("material.specular", 1);
 
-    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TransFeedbackObjId);
-    glBeginTransformFeedback(GL_TRIANGLES);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glEndTransformFeedback();
-    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, GL_NONE);
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,   0.0f,  0.0f),
+            glm::vec3( 0.0f,   0.1f, -2.0f),
+            glm::vec3( 0.0f,   0.2f, -3.0f),
+            glm::vec3( 0.0f,   0.3f, -4.0f),
+            glm::vec3( 0.0f,   0.4f, -6.0f),
+            glm::vec3( 1.2f,   0.0f, -3.0f),
+            glm::vec3(-1.2f,   0.0f, -3.0f),
+            glm::vec3(-2.2f,  -2.0f, -6.0f),
+            glm::vec3( 2.2f,  -2.0f, -6.0f),
+            glm::vec3( 0.0f,  -8.0f, -12.0f)
+    };
+    for (unsigned int i = 0; i < 10; i++) {
+        // calculate the model matrix for each object and pass it to shader before drawing
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        float angle = 20.0f * i;
+        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        lightingShader.setMat4("model", model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
     glBindVertexArray(GL_NONE);
 
-    // Read feedback buffer
-    glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_TransFeedbackBufId);
-    void* rawData = glMapBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 3 * 6 * 6 * sizeof(GLfloat), GL_MAP_READ_BIT);
-
-    float *p = (float*) rawData;
-    for(int i= 0; i < 36; i++) {
-        LOGE("DirectionalLightSample::Draw() read feedback buffer Normal[%d] = [%f, %f, %f]",
-             i, p[i * 3], p[i * 3 + 1], p[i * 3 + 2]);
-    }
-
-    glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
-    glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 
     // also draw the lamp object
-    lightCubeShader.use();
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
-    model = glm::translate(model, lightPos);
-    lightCubeShader.setMat4("model", model);
-    lightCubeShader.setMat4("view", view);
-    lightCubeShader.setMat4("projection", projection);
-
-    glBindVertexArray(lightCubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(GL_NONE);
+//    lightCubeShader.use();
+//    model = glm::mat4(1.0f);
+//    model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
+//    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+//    model = glm::translate(model, lightPos);
+//    lightCubeShader.setMat4("model", model);
+//    lightCubeShader.setMat4("view", view);
+//    lightCubeShader.setMat4("projection", projection);
+//
+//    glBindVertexArray(lightCubeVAO);
+//    glDrawArrays(GL_TRIANGLES, 0, 36);
+//    glBindVertexArray(GL_NONE);
 }
 
 void DirectionalLightSample::destroy() {
@@ -407,7 +413,7 @@ void DirectionalLightSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, i
     float lightZ = 2.8f * cos(radiansY);
     lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
     // View matrix
-    eyePosition = glm::vec3 (1.6f, 3.0f, 2.0f);
+    eyePosition = glm::vec3 (0.0f, 1.0f, 3.0f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
