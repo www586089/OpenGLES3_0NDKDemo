@@ -32,6 +32,7 @@
 #define SAMPLE_LEARN_PHONG_TEXTURE              SAMPLE_TYPE + 15
 #define SAMPLE_LEARN_LIGHT_DIRECTIONAL          SAMPLE_TYPE + 16    //定向光
 #define SAMPLE_POINT_LIGHT                      SAMPLE_TYPE + 17    //点光源
+#define SAMPLE_SPOTLIGHT                        SAMPLE_TYPE + 18    //聚光灯源
 #define SAMPLE_TYPE_KEY_MULTI_LIGHTS            SAMPLE_TYPE + 10
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12

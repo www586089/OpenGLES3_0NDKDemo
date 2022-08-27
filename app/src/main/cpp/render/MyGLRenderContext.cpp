@@ -11,6 +11,7 @@
 #include "../learnog/PhongLightTextureSample.h"
 #include "../learnog/DirectionalLightSample.h"
 #include "../learnog/PointLightSample.h"
+#include "../learnog/SpotlightSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -171,6 +172,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_POINT_LIGHT:
                 pCurrentSample = new PointLightSample();
+                break;
+            case SAMPLE_SPOTLIGHT:
+                pCurrentSample = new SpotlightSample();
                 break;
 //            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
 //                pCurrentSample = new MultiLightsSample();
