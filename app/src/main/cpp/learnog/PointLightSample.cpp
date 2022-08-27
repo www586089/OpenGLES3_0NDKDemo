@@ -109,12 +109,15 @@ void PointLightSample::init() {
             "    float shininess;                                    \n"
             "};                                                      \n"
             "struct Light {                                          \n"
-            "    vec3 direction;                                     \n"
-            "    //vec3 position;                                    \n"
+            "    vec3 position;                                      \n"
             "                                                        \n"
             "    vec3 ambient;                                       \n"
             "    vec3 diffuse;                                       \n"
             "    vec3 specular;                                      \n"
+            "                                                        \n"
+            "    float constant;                                     \n"
+            "    float linear;                                       \n"
+            "    float quadratic;                                    \n"
             "};                                                      \n"
             "out vec4 FragColor;                                     \n"
             "                                                        \n"
@@ -125,24 +128,27 @@ void PointLightSample::init() {
             "                                                        \n"
             "in vec3 FragPos;                                        \n"
             "in vec3 Normal;                                         \n"
-            "in vec2 TexCoords;\n"
+            "in vec2 TexCoords;                                      \n"
             "                                                        \n"
             "void main()                                             \n"
             "{                                                       \n"
             "    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;    \n"
             "                                                        \n"
             "    vec3 normal = normalize(Normal);                    \n"
-            "    //vec3 lightDir = normalize(light.position - FragPos);\n"
-            "    vec3 lightDir = normalize(-light.direction);\n"
+            "    vec3 lightDir = normalize(light.position - FragPos);\n"
             "    float diff = max(dot(normal, lightDir), 0.0);       \n"
-            "    vec3 diffuse = light.diffuse * (texture(material.diffuse, TexCoords).rgb * diff);                     \n"
+            "    vec3 diffuse = light.diffuse * (texture(material.diffuse, TexCoords).rgb * diff);      \n"
+            "                                                                                           \n"
+            "    vec3 viewDir = normalize(viewPos - FragPos);                                           \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                                          \n"
+            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);             \n"
+            "    vec3 specular =  light.specular * (texture(material.specular, TexCoords).rgb * spec);  \n"
+            "                                                                                           \n"
+            "    // attenuation                                                                         \n"
+            "    float distance = length(light.position - FragPos);                                     \n"
+            "    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance)); \n"
             "                                                                                  \n"
-            "    vec3 viewDir = normalize(viewPos - FragPos);                                  \n"
-            "    vec3 reflectDir = reflect(-lightDir, normal);                                 \n"
-            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);    \n"
-            "    vec3 specular =  light.specular * (texture(material.specular, TexCoords).rgb * spec);                 \n"
-            "                                                                                  \n"
-            "    vec3 result = (ambient + diffuse + specular);                   \n"
+            "    vec3 result = (ambient + diffuse + specular) * attenuation;                   \n"
             "    FragColor = vec4(result, 1.0);                                                \n"
             "}                                                                                 \n"
     ;
@@ -309,8 +315,11 @@ void PointLightSample::draw(int screenW, int screenH) {
     lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
     lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.75f, 0.75f, 0.75f); // darken diffuse light a bit
     lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3("light.direction", 0.0f, -1.0f, 0.0f);//-0.2f, -1.0f, -0.3f
-    //lightingShader.setVec3("light.position", lightPos);
+//    lightingShader.setVec3("light.direction", 0.0f, -1.0f, 0.0f);//-0.2f, -1.0f, -0.3f
+    lightingShader.setVec3("light.position", lightPos);
+    lightingShader.setFloat("light.constant",  1.0f);
+    lightingShader.setFloat("light.linear",    0.045f);
+    lightingShader.setFloat("light.quadratic", 0.0075f);
 
     // world transformation
     model = glm::mat4(1.0f);
@@ -359,7 +368,7 @@ void PointLightSample::draw(int screenW, int screenH) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * i;
-        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+//        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         lightingShader.setMat4("model", model);
 
@@ -369,18 +378,18 @@ void PointLightSample::draw(int screenW, int screenH) {
 
 
     // also draw the lamp object
-//    lightCubeShader.use();
-//    model = glm::mat4(1.0f);
-//    model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
-//    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
-//    model = glm::translate(model, lightPos);
-//    lightCubeShader.setMat4("model", model);
-//    lightCubeShader.setMat4("view", view);
-//    lightCubeShader.setMat4("projection", projection);
-//
-//    glBindVertexArray(lightCubeVAO);
-//    glDrawArrays(GL_TRIANGLES, 0, 36);
-//    glBindVertexArray(GL_NONE);
+    lightCubeShader.use();
+    model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+    model = glm::translate(model, lightPos);
+    lightCubeShader.setMat4("model", model);
+    lightCubeShader.setMat4("view", view);
+    lightCubeShader.setMat4("projection", projection);
+
+    glBindVertexArray(lightCubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(GL_NONE);
 }
 
 void PointLightSample::destroy() {
@@ -409,8 +418,8 @@ void PointLightSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int ang
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
     float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
-    float lightX = 2.8f * sin(radiansY);
-    float lightZ = 2.8f * cos(radiansY);
+    float lightX = 5.8f * sin(radiansY);
+    float lightZ = 5.8f * cos(radiansY);
     lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
     // View matrix
     eyePosition = glm::vec3 (0.0f, 1.0f, 3.0f);
