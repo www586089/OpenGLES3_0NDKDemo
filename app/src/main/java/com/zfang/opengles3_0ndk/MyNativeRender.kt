@@ -90,4 +90,6 @@ class MyNativeRender {
         scaleX: Float,
         scaleY: Float
     )
+
+    external fun setImageDataWithIndex(index: Int, format: Int, width: Int, height: Int, bytes: ByteArray?)
 }

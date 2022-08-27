@@ -13,6 +13,7 @@ public :
     ~MyGLRenderContext();
 
     void setImageData(int format, int width, int height, unsigned char *pData);
+    void setImageDataWithIndex(int index, int format, int width, int height, uint8_t *pData);
 
     void onSurfaceCreated();
     void onSurfaceChanged(int width, int height);

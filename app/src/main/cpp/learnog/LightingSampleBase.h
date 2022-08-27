@@ -35,7 +35,8 @@ protected:
 
     glm::mat4 mvpMatrix;
 
-    NativeImage m_RenderImage;
+    NativeImage diffuseImage;
+    NativeImage specularImage;
     GLuint textureDiffuse;  //漫反射贴图
     GLuint textureSpecular;//高光贴图
 };

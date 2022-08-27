@@ -49,6 +49,20 @@ Java_com_zfang_opengles3_10ndk_MyNativeRender_native_1SetImageData(JNIEnv *env, 
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_zfang_opengles3_10ndk_MyNativeRender_setImageDataWithIndex(JNIEnv *env, jobject thiz,
+                                                                    jint index, jint format,
+                                                                    jint width, jint height,
+                                                                    jbyteArray imageData) {
+    int len = env->GetArrayLength (imageData);
+    uint8_t* buf = new uint8_t[len];
+    env->GetByteArrayRegion(imageData, 0, len, reinterpret_cast<jbyte*>(buf));
+    MyGLRenderContext::GetInstance()->setImageDataWithIndex(index, format, width, height, buf);
+    delete[] buf;
+    env->DeleteLocalRef(imageData);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_zfang_opengles3_10ndk_MyNativeRender_native_1OnSurfaceCreated(JNIEnv *env, jobject thiz) {
     MyGLRenderContext::GetInstance()->onSurfaceCreated();
 }

@@ -63,7 +63,7 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     }
 
     public void setImageDataWithIndex(int index, int format, int width, int height, byte[] bytes) {
-//        mNativeRender.native_SetImageDataWithIndex(index, format, width, height, bytes);
+        mNativeRender.setImageDataWithIndex(index, format, width, height, bytes);
     }
 
     public void setAudioData(short[] audioData) {

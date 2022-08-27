@@ -100,7 +100,7 @@ void PhongLightTextureSample::init() {
             "#version 300 es                                         \n"
             "struct Material {                                       \n"
             "    sampler2D  diffuse;                                       \n"
-            "    vec3 specular;                                      \n"
+            "    sampler2D specular;                                      \n"
             "    float shininess;                                    \n"
             "};                                                      \n"
             "struct Light {                                          \n"
@@ -133,7 +133,7 @@ void PhongLightTextureSample::init() {
             "    vec3 viewDir = normalize(viewPos - FragPos);                                  \n"
             "    vec3 reflectDir = reflect(-lightDir, normal);                                 \n"
             "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);    \n"
-            "    vec3 specular =  light.specular * (material.specular * spec);                 \n"
+            "    vec3 specular =  light.specular * (texture(material.specular, TexCoords).rgb * spec);                 \n"
             "                                                                                  \n"
             "    vec3 result = (ambient + diffuse + specular);                   \n"
             "    FragColor = vec4(result, 1.0);                                                \n"
@@ -194,6 +194,15 @@ void PhongLightTextureSample::init() {
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 
+        // Config Specular Map
+        glGenTextures(1, &textureSpecular);
+        glBindTexture(GL_TEXTURE_2D, textureSpecular);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
         // first, configure the cube's VAO (and VBO)
         glGenVertexArrays(1, &cubeVAO);
         glBindVertexArray(cubeVAO);
@@ -234,13 +243,24 @@ void PhongLightTextureSample::init() {
 void PhongLightTextureSample::loadImage(NativeImage *pImage) {
     LOGE("PhongLightTextureSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
-        m_RenderImage.width = pImage->width;
-        m_RenderImage.height = pImage->height;
-        m_RenderImage.format = pImage->format;
-        NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
+        diffuseImage.width = pImage->width;
+        diffuseImage.height = pImage->height;
+        diffuseImage.format = pImage->format;
+        NativeImageUtil::CopyNativeImage(pImage, &diffuseImage);
     }
 }
 
+void PhongLightTextureSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
+    LOGE("PhongLightTextureSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+    if (pImage) {
+        if (0 == index) {
+            specularImage.width = pImage->width;
+            specularImage.height = pImage->height;
+            specularImage.format = pImage->format;
+            NativeImageUtil::CopyNativeImage(pImage, &specularImage);
+        }
+    }
+}
 
 void PhongLightTextureSample::draw(int screenW, int screenH) {
     LOGE("PhongLightTextureSample::Draw()");
@@ -271,7 +291,7 @@ void PhongLightTextureSample::draw(int screenW, int screenH) {
     // set materials
     lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
     lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+//    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     lightingShader.setFloat("material.shininess", 32.0f);
     // set Light
     glm::vec3 lightColor;
@@ -293,10 +313,16 @@ void PhongLightTextureSample::draw(int screenW, int screenH) {
     lightingShader.setMat4("projection", projection);
     lightingShader.setMat4("view", view);
 
-    //upload RGBA image data
+    //upload RGBA image data Diffuse
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureDiffuse);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_RenderImage.ppPlane[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseImage.width, diffuseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseImage.ppPlane[0]);
+    glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+    //upload RGBA image data Specular
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, specularImage.width, specularImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, specularImage.ppPlane[0]);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
     // render the cube
@@ -304,7 +330,10 @@ void PhongLightTextureSample::draw(int screenW, int screenH) {
     // Bind the RGBA map
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureDiffuse);
-    lightingShader.setInt("Material.diffuse", 0);
+    lightingShader.setInt("material.diffuse", 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+    lightingShader.setInt("material.specular", 1);
 
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TransFeedbackObjId);
     glBeginTransformFeedback(GL_TRIANGLES);
@@ -350,6 +379,7 @@ void PhongLightTextureSample::destroy() {
         glDeleteVertexArrays(1, &cubeVAO);
         glDeleteVertexArrays(1, &lightCubeVAO);
         glDeleteTextures(1, &textureDiffuse);
+        glDeleteTextures(1, &textureSpecular);
     }
 }
 

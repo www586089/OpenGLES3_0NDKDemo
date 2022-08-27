@@ -54,6 +54,33 @@ void MyGLRenderContext::setImageData(int format, int width, int height, uint8_t 
     }
 }
 
+void MyGLRenderContext::setImageDataWithIndex(int index, int format, int width, int height,uint8_t *pData) {
+    LOGE("MyGLRenderContext::setImageDataWithIndex index=%d, format=%d, width=%d, height=%d, pData=%p",index, format, width, height, pData);
+    NativeImage nativeImage;
+    nativeImage.format = format;
+    nativeImage.width = width;
+    nativeImage.height = height;
+    nativeImage.ppPlane[0] = pData;
+
+    switch (format) {
+        case IMAGE_FORMAT_NV12:
+        case IMAGE_FORMAT_NV21:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            break;
+        case IMAGE_FORMAT_I420:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            nativeImage.ppPlane[2] = nativeImage.ppPlane[1] + width * height / 4;
+            break;
+        default:
+            break;
+    }
+
+    if (nullptr != pCurrentSample) {
+        pCurrentSample->loadMultiImageWithIndex(index, &nativeImage);
+    }
+
+}
+
 void MyGLRenderContext::onSurfaceCreated() {
     LOGE("MyGLRenderContext::onSurfaceCreated");
     glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
