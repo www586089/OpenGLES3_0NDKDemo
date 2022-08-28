@@ -37,16 +37,16 @@ void MultiLightsSample::init() {
     GLfloat vertices[] = {
             //vertex     normal               // texture coord
             -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-            r, -r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-            r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-            r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             r, -r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
             -r,  r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
             -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
             -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-            r, -r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-            r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-            r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+             r, -r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
             -r,  r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
             -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
 
@@ -57,24 +57,24 @@ void MultiLightsSample::init() {
             -r, -r,  r, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
             -r,  r,  r, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-            r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-            r,  r, -r,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-            r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            r, -r,  r,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-            r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+             r,  r, -r,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             r, -r,  r,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
             -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-            r, -r, -r,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-            r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-            r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+             r, -r, -r,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
             -r, -r,  r,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
             -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
             -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-            r,  r, -r,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-            r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-            r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+             r,  r, -r,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
             -r,  r,  r,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
             -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
@@ -103,72 +103,153 @@ void MultiLightsSample::init() {
 
     char lightingFShaderStr[] =
             "#version 300 es                 \n"
-            "out vec4 FragColor;             \n"
-            "                                \n"
-            "struct Material {               \n"
-            "    sampler2D diffuse;          \n"
-            "    sampler2D specular;         \n"
-            "    float shininess;            \n"
-            "};                              \n"
-            "                                \n"
-            "struct Light {                  \n"
-            "    vec3 position;              \n"
-            "    vec3 direction;             \n"
-            "    float cutOff;               \n"
-            "    float outerCutOff;          \n"
-            "                                \n"
-            "    vec3 ambient;               \n"
-            "    vec3 diffuse;               \n"
-            "    vec3 specular;              \n"
-            "                                \n"
-            "    float constant;             \n"
-            "    float linear;               \n"
-            "    float quadratic;            \n"
-            "};                              \n"
-            "                                \n"
-            "in vec3 FragPos;                \n"
-            "in vec3 Normal;                 \n"
-            "in vec2 TexCoords;              \n"
-            "                                \n"
-            "uniform vec3 viewPos;           \n"
-            "uniform Material material;      \n"
-            "uniform Light light;            \n"
-            "                                \n"
-            "void main()                                                                                                            \n"
-            "{                                                                                                                      \n"
-            "    // ambient                                                                                                         \n"
-            "    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;                                           \n"
-            "                                                                                                                       \n"
-            "    // diffuse                                                                                                         \n"
-            "    vec3 norm = normalize(Normal);                                                                                     \n"
-            "    vec3 lightDir = normalize(light.position - FragPos);                                                               \n"
-            "    float diff = max(dot(norm, lightDir), 0.0);                                                                        \n"
-            "    vec3 diffuse = light.diffuse * diff * texture(material.diffuse, TexCoords).rgb;                                    \n"
-            "                                                                                                                       \n"
-            "    // specular                                                                                                        \n"
-            "    vec3 viewDir = normalize(viewPos - FragPos);                                                                       \n"
-            "    vec3 reflectDir = reflect(-lightDir, norm);                                                                        \n"
-            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);                                          \n"
-            "    vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;                                 \n"
-            "                                                                                                                       \n"
-            "    // spotlight (soft edges)                                                                                          \n"
-            "    float theta = dot(lightDir, normalize(-light.direction));                                                          \n"
-            "    float epsilon = (light.cutOff - light.outerCutOff);                                                                \n"
-            "    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);                                          \n"
-            "    diffuse  *= intensity;                                                                                             \n"
-            "    specular *= intensity;                                                                                             \n"
-            "                                                                                                                       \n"
-            "    // attenuation                                                                                                     \n"
-            "    float distance    = length(light.position - FragPos);                                                              \n"
+            "out vec4 FragColor;\n"
+            "\n"
+            "struct Material {\n"
+            "    sampler2D diffuse;\n"
+            "    sampler2D specular;\n"
+            "    float shininess;\n"
+            "}; \n"
+            "\n"
+            "struct DirLight {\n"
+            "    vec3 direction;\n"
+            "\t\n"
+            "    vec3 ambient;\n"
+            "    vec3 diffuse;\n"
+            "    vec3 specular;\n"
+            "};\n"
+            "\n"
+            "struct PointLight {\n"
+            "    vec3 position;\n"
+            "    \n"
+            "    float constant;\n"
+            "    float linear;\n"
+            "    float quadratic;\n"
+            "\t\n"
+            "    vec3 ambient;\n"
+            "    vec3 diffuse;\n"
+            "    vec3 specular;\n"
+            "};\n"
+            "\n"
+            "struct SpotLight {\n"
+            "    vec3 position;\n"
+            "    vec3 direction;\n"
+            "    float cutOff;\n"
+            "    float outerCutOff;\n"
+            "  \n"
+            "    float constant;\n"
+            "    float linear;\n"
+            "    float quadratic;\n"
+            "  \n"
+            "    vec3 ambient;\n"
+            "    vec3 diffuse;\n"
+            "    vec3 specular;       \n"
+            "};\n"
+            "\n"
+            "#define NR_POINT_LIGHTS 4\n"
+            "\n"
+            "in vec3 FragPos;\n"
+            "in vec3 Normal;\n"
+            "in vec2 TexCoords;\n"
+            "\n"
+            "uniform vec3 viewPos;\n"
+            "uniform DirLight dirLight;\n"
+            "uniform PointLight pointLights[NR_POINT_LIGHTS];\n"
+            "uniform SpotLight spotLight;\n"
+            "uniform Material material;\n"
+            "\n"
+            "// function prototypes\n"
+            "vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);\n"
+            "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n"
+            "vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n"
+            "\n"
+            "void main()                                                                                      \n"
+            "{                                                                                                \n"
+            "    // properties                                                                                \n"
+            "    vec3 norm = normalize(Normal);                                                               \n"
+            "    vec3 viewDir = normalize(viewPos - FragPos);                                                 \n"
+            "                                                                                                 \n"
+            "    // == =====================================================                                  \n"
+            "    // Our lighting is set up in 3 phases: directional, point lights and an optional flashlight  \n"
+            "    // For each phase, a calculate function is defined that calculates the corresponding color   \n"
+            "    // per lamp. In the main() function we take all the calculated colors and sum them up for    \n"
+            "    // this fragment's final color.                                                         \n"
+            "    // == =====================================================                             \n"
+            "    // phase 1: directional lighting                                                        \n"
+            "    vec3 result = CalcDirLight(dirLight, norm, viewDir);                                    \n"
+            "    // phase 2: point lights                                                                \n"
+            "    for(int i = 0; i < NR_POINT_LIGHTS; i++)                                                \n"
+            "        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);                   \n"
+            "    // phase 3: spot light                                                                  \n"
+            "    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);                             \n"
+            "                                                                                            \n"
+            "    FragColor = vec4(result, 1.0);                                                          \n"
+            "}                                                                                           \n"
+            "\n"
+            "// calculates the color when using a directional light.                                     \n"
+            "vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)                                \n"
+            "{                                                                                           \n"
+            "    vec3 lightDir = normalize(-light.direction);                                            \n"
+            "    // diffuse shading                                                                      \n"
+            "    float diff = max(dot(normal, lightDir), 0.0);                                           \n"
+            "    // specular shading                                                                     \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                                           \n"
+            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);               \n"
+            "    // combine results                                                                      \n"
+            "    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));              \n"
+            "    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));       \n"
+            "    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));    \n"
+            "    return (ambient + diffuse + specular);                                                  \n"
+            "}                                                                                           \n"
+            "\n"
+            "// calculates the color when using a point light.                                           \n"
+            "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)              \n"
+            "{                                                                                           \n"
+            "    vec3 lightDir = normalize(light.position - fragPos);                                    \n"
+            "    // diffuse shading                                                                      \n"
+            "    float diff = max(dot(normal, lightDir), 0.0);                                           \n"
+            "    // specular shading                                                                     \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                                           \n"
+            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);               \n"
+            "    // attenuation                                                                          \n"
+            "    float distance = length(light.position - fragPos);                                      \n"
+            "    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n"
+            "    // combine results                                                                      \n"
+            "    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));              \n"
+            "    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));       \n"
+            "    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));    \n"
+            "    ambient *= attenuation;                                                                 \n"
+            "    diffuse *= attenuation;                                                                 \n"
+            "    specular *= attenuation;                                                                \n"
+            "    return (ambient + diffuse + specular);                                                  \n"
+            "}                                                                                           \n"
+            "                                                                                            \n"
+            "// calculates the color when using a spot light.                                            \n"
+            "vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)                \n"
+            "{                                                                                           \n"
+            "    vec3 lightDir = normalize(light.position - fragPos);                                    \n"
+            "    // diffuse shading                                                                      \n"
+            "    float diff = max(dot(normal, lightDir), 0.0);                                           \n"
+            "    // specular shading                                                                     \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                                           \n"
+            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);               \n"
+            "    // attenuation                                                                          \n"
+            "    float distance = length(light.position - fragPos);                                      \n"
             "    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    \n"
-            "    ambient  *= attenuation;                                                                                           \n"
-            "    diffuse  *= attenuation;                                                                                           \n"
-            "    specular *= attenuation;                                                                                           \n"
-            "                                                                                                                       \n"
-            "    vec3 result = ambient + diffuse + specular;                                                                        \n"
-            "    FragColor = vec4(result, 1.0);                                                                                     \n"
-            "}                                                                                                                      \n"
-    ;
+            "    // spotlight intensity                                                                  \n"
+            "    float theta = dot(lightDir, normalize(-light.direction));                               \n"
+            "    float epsilon = light.cutOff - light.outerCutOff;                                       \n"
+            "    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);               \n"
+            "    // combine results                                                                      \n"
+            "    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));              \n"
+            "    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));       \n"
+            "    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));    \n"
+            "    ambient *= attenuation * intensity;                                                     \n"
+            "    diffuse *= attenuation * intensity;                                                     \n"
+            "    specular *= attenuation * intensity;                                                    \n"
+            "    return (ambient + diffuse + specular);                                                  \n"
+            "}"
+            ;
 
     char lightingCubeVShaderStr[] =
             "#version 300 es                                                   \n"
@@ -310,24 +391,92 @@ void MultiLightsSample::draw(int screenW, int screenH) {
 //    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     lightingShader.setFloat("material.shininess", 32.0f);
     // set Light
-    glm::vec3 lightColor;
-    lightColor.x = static_cast<float>(sin(radiansY * 2.0));
-    lightColor.y = static_cast<float>(sin(radiansY * 0.7));
-    lightColor.z = static_cast<float>(sin(radiansY * 1.3));
-    glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f); // decrease the influence
-    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-    lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
-    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.75f, 0.75f, 0.75f); // darken diffuse light a bit
-    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+//    glm::vec3 lightColor;
+//    lightColor.x = static_cast<float>(sin(radiansY * 2.0));
+//    lightColor.y = static_cast<float>(sin(radiansY * 0.7));
+//    lightColor.z = static_cast<float>(sin(radiansY * 1.3));
+//    glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f); // decrease the influence
+//    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+//    lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
+//    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.75f, 0.75f, 0.75f); // darken diffuse light a bit
+//    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 //    lightingShader.setVec3("light.direction", 0.0f, -1.0f, 0.0f);//-0.2f, -1.0f, -0.3f
-    lightingShader.setVec3("light.position", lightPos);
-    lightingShader.setVec3("light.direction", 0.0f, -1.0f, -1.0f);
-    lightingShader.setFloat("light.cutOff",   glm::cos(glm::radians(12.5f)));
-    lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+//    lightingShader.setVec3("light.position", lightPos);
+//    lightingShader.setVec3("light.direction", 0.0f, -1.0f, -1.0f);
+//    lightingShader.setFloat("light.cutOff",   glm::cos(glm::radians(12.5f)));
+//    lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+//
+//    lightingShader.setFloat("light.constant",  1.0f);
+//    lightingShader.setFloat("light.linear",    0.045f);
+//    lightingShader.setFloat("light.quadratic", 0.0075f);
 
-    lightingShader.setFloat("light.constant",  1.0f);
-    lightingShader.setFloat("light.linear",    0.045f);
-    lightingShader.setFloat("light.quadratic", 0.0075f);
+
+    // set Light begin
+
+    /*
+       Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
+       the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
+       by defining light types as classes and set their values in there, or by using a more efficient uniform approach
+       by using 'Uniform buffer objects', but that is something we'll discuss in the 'Advanced GLSL' tutorial.
+    */
+    // positions of the point lights
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3( 0.5f,  1.5f,  -2.0f),
+            glm::vec3( 0.0f, -3.3f, -4.0f),
+            glm::vec3(-0.5f,  2.0f, -6.0f),
+            glm::vec3( 0.0f,  2.0f, -3.0f)
+    };
+    // directional light
+    lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    lightingShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    // point light 1
+    lightingShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+    lightingShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    lightingShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setFloat("pointLights[0].constant", 1.0f);
+    lightingShader.setFloat("pointLights[0].linear", 0.09f);
+    lightingShader.setFloat("pointLights[0].quadratic", 0.032f);
+    // point light 2
+    lightingShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+    lightingShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    lightingShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setFloat("pointLights[1].constant", 1.0f);
+    lightingShader.setFloat("pointLights[1].linear", 0.09f);
+    lightingShader.setFloat("pointLights[1].quadratic", 0.032f);
+    // point light 3
+    lightingShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+    lightingShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    lightingShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setFloat("pointLights[2].constant", 1.0f);
+    lightingShader.setFloat("pointLights[2].linear", 0.09f);
+    lightingShader.setFloat("pointLights[2].quadratic", 0.032f);
+    // point light 4
+    lightingShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+    lightingShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    lightingShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    lightingShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setFloat("pointLights[3].constant", 1.0f);
+    lightingShader.setFloat("pointLights[3].linear", 0.09f);
+    lightingShader.setFloat("pointLights[3].quadratic", 0.032f);
+    // spotLight
+    lightingShader.setVec3("spotLight.position", lightPos);
+    lightingShader.setVec3("spotLight.direction", 0.0f, -1.0f, -1.0f);
+    lightingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+    lightingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+    lightingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+    lightingShader.setFloat("spotLight.constant", 1.0f);
+    lightingShader.setFloat("spotLight.linear", 0.09f);
+    lightingShader.setFloat("spotLight.quadratic", 0.032f);
+    lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+    // set Light end
+
+
 
     // world transformation
     model = glm::mat4(1.0f);
@@ -376,7 +525,7 @@ void MultiLightsSample::draw(int screenW, int screenH) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * i;
-//        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         lightingShader.setMat4("model", model);
 
@@ -396,8 +545,20 @@ void MultiLightsSample::draw(int screenW, int screenH) {
     lightCubeShader.setMat4("projection", projection);
 
     glBindVertexArray(lightCubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 36); // draw spotlight
+    // we now draw as many light bulbs as we have point lights.
+    glBindVertexArray(lightCubeVAO);
+    for (unsigned int i = 0; i < 4; i++) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, pointLightPositions[i]);
+        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
+        model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+        lightCubeShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
     glBindVertexArray(GL_NONE);
+
 }
 
 void MultiLightsSample::destroy() {
