@@ -21,6 +21,7 @@
 #include <CoordinateSystemSample.h>
 #include <BasicLightingSample.h>
 #include <TransformFeedbackSample.h>
+#include <MultiLightsSample2.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -180,9 +181,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_MULTILIGHTS:
                 pCurrentSample = new MultiLightsSample();
                 break;
-//            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
-//                pCurrentSample = new MultiLightsSample();
-//                break;
+            case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
+                pCurrentSample = new MultiLightsSample2();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;
