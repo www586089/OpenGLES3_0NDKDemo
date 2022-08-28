@@ -5,7 +5,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.18.1)
-
+set(jnilibs "${CMAKE_SOURCE_DIR}/../jniLibs")
 # Declares and names the project.
 
 project("opengles3_0ndk")
@@ -42,31 +42,6 @@ add_library(
 
         # Provides a relative path to your source file(s).
         ${src-files}
-#        sample/CoordinateSystemSample.h
-#        sample/CoordinateSystemSample.cpp
-#        sample/FBOLegLengthenSample.h
-#        sample/FBOLegLengthenSample.cpp
-#        render/EGLRender.h
-#        render/EGLRender.cpp
-#        sample/FBOSample.h
-#        sample/FBOSample.cpp
-#        Opengles3_0ndk.cpp
-#        render/MyGLRenderContext.h
-#        sample/TriangleSample.h
-#        sample/TextureMapSample.h
-#        sample/NV21TextureMapSample.h
-#        sample/VaoSample.h
-#        sample/VBOSample.h
-#        sample/GeometryInstanced.h
-#
-#        render/MyGLRenderContext.cpp
-#        sample/TriangleSample.cpp
-#        sample/TextureMapSample.cpp
-#        sample/NV21TextureMapSample.cpp
-#        sample/VaoSample.cpp
-#        sample/VBOSample.cpp
-#        sample/GeometryInstanced.cpp
-#        ./utils/GLUtils.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -82,10 +57,21 @@ find_library( # Sets the name of the path variable.
               # you want CMake to locate.
               log )
 
+add_library(assimp SHARED IMPORTED )
+set_target_properties(assimp PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libassimp.so)
+
+add_library(opencv_java3 SHARED IMPORTED )
+set_target_properties(opencv_java3 PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libopencv_java3.so)
+
+add_library(freetype STATIC IMPORTED )
+set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libfreetype.a)
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
-
+set(third-party-libs
+        freetype
+        assimp
+        opencv_java3)
 target_link_libraries(
         # Specifies the target library.
 
@@ -96,4 +82,6 @@ target_link_libraries(
         # Links the target library to the log library
         # included in the NDK.
 
-        ${log-lib} )
+        ${log-lib}
+        ${third-party-libs}
+)
