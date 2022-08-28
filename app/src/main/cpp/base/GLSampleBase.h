@@ -35,17 +35,17 @@
 #define SAMPLE_SPOTLIGHT                        SAMPLE_TYPE + 18    //聚光灯源
 #define SAMPLE_MULTILIGHTS                      SAMPLE_TYPE + 19    //聚合多种光源
 #define SAMPLE_TYPE_KEY_MULTI_LIGHTS            SAMPLE_TYPE + 20
+#define SAMPLE_TYPE_KEY_3D_MODEL                SAMPLE_TYPE + 21
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12
 #define SAMPLE_TYPE_KEY_STENCIL_TESTING         SAMPLE_TYPE + 13
 #define SAMPLE_TYPE_KEY_BLENDING                SAMPLE_TYPE + 14
 #define SAMPLE_TYPE_KEY_PARTICLES               SAMPLE_TYPE + 15
 #define SAMPLE_TYPE_KEY_SKYBOX                  SAMPLE_TYPE + 16
-#define SAMPLE_TYPE_KEY_3D_MODEL                SAMPLE_TYPE + 17
 #define SAMPLE_TYPE_KEY_PBO                     SAMPLE_TYPE + 18
 #define SAMPLE_TYPE_KEY_BEATING_HEART           SAMPLE_TYPE + 19
 #define SAMPLE_TYPE_KEY_CLOUD                   SAMPLE_TYPE + 20
-#define SAMPLE_TYPE_KEY_TIME_TUNNEL             SAMPLE_TYPE + 21
+#define SAMPLE_TYPE_KEY_TIME_TUNNEL             SAMPLE_TYPE + 211
 #define SAMPLE_TYPE_KEY_BEZIER_CURVE            SAMPLE_TYPE + 22
 #define SAMPLE_TYPE_KEY_BIG_EYES                SAMPLE_TYPE + 23
 #define SAMPLE_TYPE_KEY_FACE_SLENDER            SAMPLE_TYPE + 24
@@ -77,7 +77,7 @@
 #define SAMPLE_TYPE_KEY_SET_TOUCH_LOC           SAMPLE_TYPE + 999
 #define SAMPLE_TYPE_SET_GRAVITY_XY              SAMPLE_TYPE + 1000
 
-#define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.byteflow.app/files/Download"
+#define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.zfang.opengles3_0ndk/files/Download"
 
 class GLSampleBase {
 public:

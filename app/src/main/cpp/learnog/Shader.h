@@ -13,6 +13,7 @@
 #include <GLES3/gl3.h>
 #include <ext/matrix_float2x2.hpp>
 #include <LogUtil.h>
+#include <GLUtils.h>
 
 class Shader {
 public:
@@ -176,11 +177,19 @@ public:
 
     void deleteProgram() {
         if (isAvailable()) {
-            glDeleteProgram(ID);
+            GLUtils::DeleteProgram(ID);
         }
     }
 
+    ~Shader() {
+        DEBUG_LOGE();
+    }
 
+    void Destroy() {
+        deleteProgram();
+    }
+
+    unsigned int ID = 0;
 private:
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
@@ -206,8 +215,6 @@ private:
         }
     }
 
-private:
-    unsigned int ID = 0;
 };
 
 

@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Button
@@ -58,13 +59,13 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Learn OpenGL SpotLight",
         "Learn OpenGL MultiLights",
         "Complex Lighting",
+        "Assimp Load 3D Model",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
         "Blending",
         "Particles",
         "SkyBox",
-        "Assimp Load 3D Model",
         "PBO",
         "Beating Heart",
         "Cloud",
@@ -221,6 +222,9 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         if (sampleType in (SAMPLE_LEARN_PHONG_TEXTURE..SAMPLE_MULTILIGHTS)) {
                             loadRGBAImage(R.drawable.texture_specular, 0)
                         }
+                    }
+                    SAMPLE_TYPE_3D_MODEL -> {
+                        Log.e("zfang", "load 3d model")
                     }
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)

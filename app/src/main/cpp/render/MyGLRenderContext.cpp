@@ -22,6 +22,7 @@
 #include <BasicLightingSample.h>
 #include <TransformFeedbackSample.h>
 #include <MultiLightsSample2.h>
+#include <Model3DSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -184,6 +185,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_TYPE_KEY_MULTI_LIGHTS:
                 pCurrentSample = new MultiLightsSample2();
                 break;
+            case SAMPLE_TYPE_KEY_3D_MODEL:
+                pCurrentSample = new Model3DSample();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;
@@ -201,9 +205,6 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
 //                break;
 //            case SAMPLE_TYPE_KEY_SKYBOX:
 //                pCurrentSample = new SkyBoxSample();
-//                break;
-//            case SAMPLE_TYPE_KEY_3D_MODEL:
-//                pCurrentSample = new Model3DSample();
 //                break;
 //            case SAMPLE_TYPE_KEY_PBO:
 //                pCurrentSample = new PBOSample();
@@ -305,7 +306,7 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
 }
 
 void MyGLRenderContext::updateTransformMatrix(float rotateX, float rotateY, float scaleX,float scaleY) {
-    LOGE("MyGLRenderContext::UpdateTransformMatrix [rotateX, rotateY, scaleX, scaleY] = [%f, %f, %f, %f]", rotateX, rotateY, scaleX, scaleY);
+    LOGE("MyGLRenderContext::updateTransformMatrix [rotateX, rotateY, scaleX, scaleY] = [%f, %f, %f, %f]", rotateX, rotateY, scaleX, scaleY);
     if (nullptr != pCurrentSample) {
         pCurrentSample->updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     }
