@@ -16,7 +16,12 @@ include_directories(
         render
         sample
         utils
-
+        learnog
+        inc
+        inc/assimp
+        inc/freetype_2_9_1
+        model
+        opencv_3_0_0
 )
 
 file(GLOB src-files
