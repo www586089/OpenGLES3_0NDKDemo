@@ -7,9 +7,10 @@
 
 
 #include <ext/matrix_float4x4.hpp>
-#include "LightingSampleBase.h"
+#include "GLSampleBase.h"
+#include "Shader.h"
 
-class DepthBufferTestSample : public LightingSampleBase {
+class DepthBufferTestSample : public GLSampleBase {
 public:
     DepthBufferTestSample();
 
@@ -24,17 +25,34 @@ public:
 
     void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
+    virtual void loadImage(NativeImage *pImage);
+    virtual void loadMultiImageWithIndex(int index, NativeImage *pImage);
 private:
-    GLint m_SamplerLoc;
+    Shader shader;
+    GLuint cubeVAO, cubeVBO;
+    GLuint planeVAO{}, planeVBO{};
+    GLuint cubeTexture{}, floorTexture{};
+    NativeImage cubeImage;
+    NativeImage floorImage;
+    glm::mat4 model{};
+    glm::mat4 view{};
+    glm::mat4 projection{};
 
-    GLuint m_VaoId;
-    GLuint m_VboIds[1];
+    glm::vec3 eyePosition{};
+    glm::vec3 lightPos{};
 
-    int m_AngleX;
-    int m_AngleY;
+    glm::mat4 mvpMatrix{};
+
+    GLint m_SamplerLoc{};
+
+    GLuint m_VaoId{};
+    GLuint m_VboIds[1]{};
+
+    int m_AngleX{};
+    int m_AngleY{};
 
     float m_ScaleX = 0.3f;
-    float m_ScaleY;
+    float m_ScaleY{};
 };
 
 

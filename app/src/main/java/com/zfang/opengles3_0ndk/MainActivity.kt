@@ -228,7 +228,8 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         Log.e("zfang", "load 3d model")
                     }
                     SAMPLE_DEPTH_BUFFER_TEST -> {
-
+                        loadRGBAImage(R.drawable.marble)
+                        loadRGBAImage(R.drawable.metal, 0)
                     }
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)
