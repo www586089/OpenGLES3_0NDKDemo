@@ -106,7 +106,8 @@ void DepthBufferTestSample::init() {
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    FragColor = texture(texture1, TexCoords);                     \n"
+            "    //FragColor = texture(texture1, TexCoords);                     \n"
+            "   FragColor = vec4(vec3(gl_FragCoord.z), 1.0);"
             "}";
     shader = Shader(vShaderStr, fShaderStr);
 
