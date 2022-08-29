@@ -145,6 +145,12 @@ void GLUtils::DeleteProgram(GLuint &program) {
     }
 }
 
+
+GLuint GLUtils::CreateProgram(const char *pVertexShaderSource, const char *pFragShaderSource) {
+    GLuint vertexShaderHandle, fragShaderHandle;
+    return CreateProgram(pVertexShaderSource, pFragShaderSource, vertexShaderHandle, fragShaderHandle);
+}
+
 void maxVertexAttrib() {
     GLint maxVertexAttribs;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);

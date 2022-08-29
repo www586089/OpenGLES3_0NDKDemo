@@ -12,6 +12,7 @@ public:
 
     static GLuint CreateProgram(const char *pVertexShaderSource, const char *pFragShaderSource,
                                 unsigned int &vertexShaderHandle, unsigned int &fragShaderHandle);
+    static GLuint CreateProgram(const char *pVertexShaderSource, const char *pFragShaderSource);
 
     static GLuint CreateProgramWithFeedback(
             const char *pVertexShaderSource,

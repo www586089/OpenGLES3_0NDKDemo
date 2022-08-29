@@ -189,8 +189,10 @@ public:
         deleteProgram();
     }
 
-    unsigned int ID = 0;
+
 private:
+    unsigned int ID = 0;
+
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
     void checkCompileErrors(GLuint shader, std::string type) {

@@ -7,7 +7,7 @@
 
 
 #include <detail/type_mat4x4.hpp>
-#include <shader.h>
+#include <AssimpShader.h>
 #include <model.h>
 #include "GLSampleBase.h"
 #include "../utils/ImageDef.h"
@@ -32,7 +32,7 @@ public:
 private:
     glm::mat4 m_MVPMatrix;
     glm::mat4 m_ModelMatrix;
-    Shader *m_pShader;
+    AssimpShader *m_pShader;
     Model *m_pModel;
 
     int m_AngleX;
