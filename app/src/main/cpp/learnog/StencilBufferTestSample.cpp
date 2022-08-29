@@ -2,22 +2,22 @@
 // Created by Thinkpad on 2022/8/29.
 //
 
-#include "DepthBufferTestSample.h"
+#include "StencilBufferTestSample.h"
 #include <gtc/matrix_transform.hpp>
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
-DepthBufferTestSample::DepthBufferTestSample() {
+StencilBufferTestSample::StencilBufferTestSample() {
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
 }
 
-DepthBufferTestSample::~DepthBufferTestSample() {
+StencilBufferTestSample::~StencilBufferTestSample() {
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
 }
 
-void DepthBufferTestSample::init() {
+void StencilBufferTestSample::init() {
     if (shader.isAvailable()) {
         return;
     }
@@ -103,20 +103,11 @@ void DepthBufferTestSample::init() {
             "in vec2 TexCoords;                                                \n"
             "                                                                  \n"
             "uniform sampler2D texture1;                                       \n"
-            "float near = 0.1;                                                 \n"
-            "float far  = 100.0;                                               \n"
-            "                                                                  \n"
-            "float LinearizeDepth(float depth)                                 \n"
-            "{                                                                 \n"
-            "    float z = depth * 2.0 - 1.0; // back to NDC                   \n"
-            "    return (2.0 * near * far) / (far + near - z * (far - near));  \n"
-            "}                                                                 \n"
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    float depth = LinearizeDepth(gl_FragCoord.z) / 20.0; // divide by far for demonstration\n"
-            "    FragColor = vec4(vec3(depth), 1.0);                           \n"
-            "}";
+            "    FragColor = texture(texture1, TexCoords);                     \n"
+            "}";;
     shader = Shader(vShaderStr, fShaderStr);
 
     if (shader.isAvailable()) {
@@ -174,21 +165,21 @@ void DepthBufferTestSample::init() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
     } else {
-        LOGE("DepthBufferTestSample::Init create program fail");
+        LOGE("StencilBufferTestSample::Init create program fail");
         return;
     }
 }
 
 
 
-void DepthBufferTestSample::draw(int screenW, int screenH) {
-    LOGE("DepthBufferTestSample::Draw()");
+void StencilBufferTestSample::draw(int screenW, int screenH) {
+    LOGE("StencilBufferTestSample::Draw()");
 
     if (!shader.isAvailable()) {
-        LOGE("DepthBufferTestSample::Draw() return");
+        LOGE("StencilBufferTestSample::Draw() return");
         return;
     }
-    LOGE("DepthBufferTestSample::Do Draw()");
+    LOGE("StencilBufferTestSample::Do Draw()");
     // render
     // ------
     glEnable(GL_DEPTH_TEST);
@@ -242,8 +233,8 @@ void DepthBufferTestSample::draw(int screenW, int screenH) {
     glBindVertexArray(GL_NONE);
 }
 
-void DepthBufferTestSample::loadImage(NativeImage *pImage) {
-    LOGE("DepthBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+void StencilBufferTestSample::loadImage(NativeImage *pImage) {
+    LOGE("StencilBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
         cubeImage.width = pImage->width;
         cubeImage.height = pImage->height;
@@ -252,8 +243,8 @@ void DepthBufferTestSample::loadImage(NativeImage *pImage) {
     }
 }
 
-void DepthBufferTestSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
-    LOGE("DepthBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+void StencilBufferTestSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
+    LOGE("StencilBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
         if (0 == index) {
             floorImage.width = pImage->width;
@@ -264,7 +255,7 @@ void DepthBufferTestSample::loadMultiImageWithIndex(int index, NativeImage *pIma
     }
 }
 
-void DepthBufferTestSample::destroy() {
+void StencilBufferTestSample::destroy() {
     if (shader.isAvailable()) {
         shader.deleteProgram();
 
@@ -284,14 +275,14 @@ void DepthBufferTestSample::destroy() {
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void DepthBufferTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
-    LOGE("DepthBufferTestSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+void StencilBufferTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
+    LOGE("StencilBufferTestSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.0f, 100.0f);
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
     // View matrix
-    glm::vec3 eyePosition = glm::vec3 (5.0f, 2.0f, -0.2f);
+    glm::vec3 eyePosition = glm::vec3 (4.2f, 1.6f, -0.2f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
@@ -301,7 +292,7 @@ void DepthBufferTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, in
     );
 }
 
-void DepthBufferTestSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
+void StencilBufferTestSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
     GLSampleBase::updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     m_AngleX = static_cast<int>(rotateX);
     m_AngleY = static_cast<int>(rotateY);

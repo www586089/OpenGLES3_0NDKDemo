@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Complex Lighting",
         "Assimp Load 3D Model",
         "Depth Buffer Test",
+        "Stencil Buffer Test",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -227,7 +228,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_TYPE_3D_MODEL -> {
                         Log.e("zfang", "load 3d model")
                     }
-                    SAMPLE_DEPTH_BUFFER_TEST -> {
+                    SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST -> {
                         loadRGBAImage(R.drawable.marble)
                         loadRGBAImage(R.drawable.metal, 0)
                     }
