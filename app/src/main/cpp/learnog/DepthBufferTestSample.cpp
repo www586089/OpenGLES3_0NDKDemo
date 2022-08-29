@@ -103,11 +103,19 @@ void DepthBufferTestSample::init() {
             "in vec2 TexCoords;                                                \n"
             "                                                                  \n"
             "uniform sampler2D texture1;                                       \n"
+            "float near = 0.1;                                                 \n"
+            "float far  = 100.0;                                               \n"
+            "                                                                  \n"
+            "float LinearizeDepth(float depth)                                 \n"
+            "{                                                                 \n"
+            "    float z = depth * 2.0 - 1.0; // back to NDC                   \n"
+            "    return (2.0 * near * far) / (far + near - z * (far - near));  \n"
+            "}                                                                 \n"
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    //FragColor = texture(texture1, TexCoords);                     \n"
-            "   FragColor = vec4(vec3(gl_FragCoord.z), 1.0);"
+            "    float depth = LinearizeDepth(gl_FragCoord.z) / 20.0; // divide by far for demonstration\n"
+            "    FragColor = vec4(vec3(depth), 1.0);                           \n"
             "}";
     shader = Shader(vShaderStr, fShaderStr);
 
