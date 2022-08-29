@@ -28,6 +28,7 @@ public:
     virtual void loadMultiImageWithIndex(int index, NativeImage *pImage);
 private:
     Shader shader;
+    Shader colorShader;
     GLuint cubeVAO, cubeVBO;
     GLuint planeVAO{}, planeVBO{};
     GLuint cubeTexture{}, floorTexture{};
