@@ -198,6 +198,7 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
         firstFrame = false;
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
+
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -271,6 +272,7 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
     glDisable(GL_DEPTH_TEST);
+
     colorShader.use();
     colorShader.setMat4("view", view);
     colorShader.setMat4("projection", projection);
