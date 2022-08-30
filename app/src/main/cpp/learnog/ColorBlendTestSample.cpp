@@ -4,6 +4,7 @@
 
 #include "ColorBlendTestSample.h"
 #include <gtc/matrix_transform.hpp>
+#include <vector>
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
@@ -13,6 +14,9 @@ ColorBlendTestSample::ColorBlendTestSample() {
 }
 
 ColorBlendTestSample::~ColorBlendTestSample() {
+    NativeImageUtil::FreeNativeImage(&cubeImage);
+    NativeImageUtil::FreeNativeImage(&floorImage);
+    NativeImageUtil::FreeNativeImage(&grassImage);
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
 }
@@ -80,6 +84,16 @@ void ColorBlendTestSample::init() {
             -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
              5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    float transparentVertices[] = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+            1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+    };
     char vShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
@@ -106,7 +120,10 @@ void ColorBlendTestSample::init() {
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    FragColor = texture(texture1, TexCoords);                     \n"
+            "    vec4 texColor = texture(texture1, TexCoords);\n"
+            "    if(texColor.a < 0.1)\n"
+            "        discard;\n"
+            "    FragColor = texColor;"
             "}";
     shader = Shader(vShaderStr, fShaderStr);
 
@@ -145,6 +162,18 @@ void ColorBlendTestSample::init() {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (offset * sizeof(float)));
         glBindVertexArray(GL_NONE);
 
+        // transparent VAO
+        glGenVertexArrays(1, &transparentVAO);
+        glGenBuffers(1, &transparentVBO);
+        glBindVertexArray(transparentVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), transparentVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glBindVertexArray(GL_NONE);
+
 
         // Config Cube Texture
         glGenTextures(1, &cubeTexture);
@@ -161,6 +190,15 @@ void ColorBlendTestSample::init() {
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+        // Config Grass Texture
+        glGenTextures(1, &grassTexture);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
@@ -231,6 +269,30 @@ void ColorBlendTestSample::draw(int screenW, int screenH) {
     shader.setMat4("model", model/*glm::mat4(1.0f)*/);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(GL_NONE);
+
+    // transparent vegetation locations
+    // --------------------------------
+    std::vector<glm::vec3> vegetation = {
+            glm::vec3(-1.5f, 0.0f, -0.48f),
+            glm::vec3( 1.5f, 0.0f,  0.51f),
+            glm::vec3( 0.0f, 0.0f,  0.7f),
+            glm::vec3(-0.3f, 0.0f, -2.3f),
+            glm::vec3( 0.5f, 0.0f, -0.6f)
+    };
+
+    // vegetation
+    glBindVertexArray(transparentVAO);
+    glBindTexture(GL_TEXTURE_2D, grassTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, grassImage.width, grassImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grassImage.ppPlane[0]);
+    for (unsigned int i = 0; i < vegetation.size(); i++) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, vegetation[i]);
+        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+    glBindVertexArray(GL_NONE);
+
 }
 
 void ColorBlendTestSample::loadImage(NativeImage *pImage) {
@@ -251,6 +313,11 @@ void ColorBlendTestSample::loadMultiImageWithIndex(int index, NativeImage *pImag
             floorImage.height = pImage->height;
             floorImage.format = pImage->format;
             NativeImageUtil::CopyNativeImage(pImage, &floorImage);
+        } else if (1 == index) {
+            grassImage.width = pImage->width;
+            grassImage.height = pImage->height;
+            grassImage.format = pImage->format;
+            NativeImageUtil::CopyNativeImage(pImage, &grassImage);
         }
     }
 }
@@ -265,7 +332,8 @@ void ColorBlendTestSample::destroy() {
         glDeleteBuffers(1, &planeVBO);
 
         glDeleteTextures(1, &cubeTexture);
-        glDeleteBuffers(1, &floorTexture);
+        glDeleteTextures(1, &floorTexture);
+        glDeleteTextures(1, &grassTexture);
     }
 }
 

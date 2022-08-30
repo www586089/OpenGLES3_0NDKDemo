@@ -232,6 +232,9 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
                         loadRGBAImage(R.drawable.metal, 0)
+                        if (sampleType == SAMPLE_COLOR_BLEND_TEST) {
+                            loadRGBAImage(R.drawable.grass, 1)
+                        }
                     }
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)

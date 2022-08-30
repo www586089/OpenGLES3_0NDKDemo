@@ -29,29 +29,31 @@ public:
 private:
     Shader shader;
     GLuint cubeVAO, cubeVBO;
-    GLuint planeVAO{}, planeVBO{};
-    GLuint cubeTexture{}, floorTexture{};
+    GLuint planeVAO, planeVBO;
+    GLuint transparentVAO, transparentVBO;
+    GLuint cubeTexture, floorTexture, grassTexture;
     NativeImage cubeImage;
     NativeImage floorImage;
-    glm::mat4 model{};
-    glm::mat4 view{};
-    glm::mat4 projection{};
+    NativeImage grassImage;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
 
-    glm::vec3 eyePosition{};
-    glm::vec3 lightPos{};
+    glm::vec3 eyePosition;
+    glm::vec3 lightPos;
 
-    glm::mat4 mvpMatrix{};
+    glm::mat4 mvpMatrix;
 
-    GLint m_SamplerLoc{};
+    GLint m_SamplerLoc;
 
-    GLuint m_VaoId{};
-    GLuint m_VboIds[1]{};
+    GLuint m_VaoId;
+    GLuint m_VboIds[1];
 
-    int m_AngleX{};
-    int m_AngleY{};
+    int m_AngleX;
+    int m_AngleY;
 
     float m_ScaleX = 0.3f;
-    float m_ScaleY{};
+    float m_ScaleY;
 };
 
 
