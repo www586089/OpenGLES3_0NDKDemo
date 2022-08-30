@@ -15,7 +15,7 @@
 #include "../learnog/MultiLightsSample.h"
 #include "../learnog/DepthBufferTestSample.h"
 #include "../learnog/StencilBufferTestSample.h"
-#include "../learnog/ColorBlendTestSample.h"
+#include "ColorBlendTestSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -26,6 +26,7 @@
 #include <TransformFeedbackSample.h>
 #include <MultiLightsSample2.h>
 #include <Model3DSample.h>
+#include <BlendingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -200,6 +201,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_COLOR_BLEND_TEST:
                 pCurrentSample = new ColorBlendTestSample();
                 break;
+            case SAMPLE_TYPE_KEY_BLENDING:
+                pCurrentSample = new BlendingSample();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;
@@ -209,9 +213,7 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
 //            case SAMPLE_TYPE_KEY_STENCIL_TESTING:
 //                pCurrentSample = new StencilTestingSample();
 //                break;
-//            case SAMPLE_TYPE_KEY_BLENDING:
-//                pCurrentSample = new BlendingSample();
-//                break;
+
 //            case SAMPLE_TYPE_KEY_PARTICLES:
 //                pCurrentSample = new ParticlesSample();
 //                break;

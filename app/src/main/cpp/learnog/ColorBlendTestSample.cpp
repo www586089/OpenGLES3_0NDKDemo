@@ -5,6 +5,7 @@
 #include "ColorBlendTestSample.h"
 #include <gtc/matrix_transform.hpp>
 #include <vector>
+#include <map>
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
@@ -121,8 +122,6 @@ void ColorBlendTestSample::init() {
             "void main()                                                       \n"
             "{                                                                 \n"
             "    vec4 texColor = texture(texture1, TexCoords);\n"
-            "    if(texColor.a < 0.1)\n"
-            "        discard;\n"
             "    FragColor = texColor;"
             "}";
     shader = Shader(vShaderStr, fShaderStr);
@@ -222,6 +221,8 @@ void ColorBlendTestSample::draw(int screenW, int screenH) {
     // ------
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -279,14 +280,30 @@ void ColorBlendTestSample::draw(int screenW, int screenH) {
             glm::vec3(-0.3f, 0.0f, -2.3f),
             glm::vec3( 0.5f, 0.0f, -0.6f)
     };
-
+    // sort the transparent windows before rendering
+    // ---------------------------------------------
+    std::map<float, glm::vec3> sorted;
+    for (unsigned int i = 0; i < vegetation.size(); i++) {
+        float distance = glm::length(eyePosition - vegetation[i]);
+        sorted[distance] = vegetation[i];
+    }
     // vegetation
     glBindVertexArray(transparentVAO);
     glBindTexture(GL_TEXTURE_2D, grassTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, grassImage.width, grassImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grassImage.ppPlane[0]);
-    for (unsigned int i = 0; i < vegetation.size(); i++) {
+    //没有按照从远到近胡顺序透明对象，此时会有遮挡
+//    for (unsigned int i = 0; i < vegetation.size(); i++) {
+//        model = glm::mat4(1.0f);
+//        model = glm::translate(model, vegetation[i]);
+//        model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+//        shader.setMat4("model", model);
+//        glDrawArrays(GL_TRIANGLES, 0, 6);
+//    }
+
+    // windows (from furthest to nearest)
+    for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) {
         model = glm::mat4(1.0f);
-        model = glm::translate(model, vegetation[i]);
+        model = glm::translate(model, it->second);
         model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -350,7 +367,7 @@ void ColorBlendTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
     // View matrix
-    glm::vec3 eyePosition = glm::vec3 (5.0f, 2.0f, -0.2f);
+    eyePosition = glm::vec3 (0.0f, 0.8f, 6.0f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
