@@ -16,6 +16,7 @@
 #include "../learnog/DepthBufferTestSample.h"
 #include "../learnog/StencilBufferTestSample.h"
 #include "ColorBlendTestSample.h"
+#include "FaceCullingSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -203,6 +204,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_TYPE_KEY_BLENDING:
                 pCurrentSample = new BlendingSample();
+                break;
+            case SAMPLE_FACE_CULLING:
+                pCurrentSample = new FaceCullingSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();

@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Stencil Buffer Test",
         "Color Blend Test",
         "Blending",
+        "Face Culling",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -240,6 +241,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         loadRGBAImage(R.drawable.board_texture, 0)
                         loadRGBAImage(R.drawable.floor, 1)
                         loadRGBAImage(R.drawable.window, 2)
+                    }
+                    SAMPLE_FACE_CULLING -> {
+                        loadRGBAImage(R.drawable.texture_diffuse)
+                        Log.d("zfang", "Face culling")
                     }
                     SAMPLE_TYPE_PARTICLES -> {
                         loadRGBAImage(R.drawable.board_texture)
