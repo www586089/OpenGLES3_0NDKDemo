@@ -239,7 +239,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         }
                     }
                     SAMPLE_FRAME_BUFFER -> {
-                        loadRGBAImage(R.drawable.marble)
+                        loadRGBAImage(R.drawable.container)
                         loadRGBAImage(R.drawable.metal, 0)
                     }
                     SAMPLE_TYPE_BLENDING -> {
