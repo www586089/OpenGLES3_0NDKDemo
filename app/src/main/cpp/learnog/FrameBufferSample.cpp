@@ -147,8 +147,13 @@ void FrameBufferSample::init() {
             "void main()                                             \n"
             "{                                                       \n"
             "    FragColor = texture(screenTexture, TexCoords);      \n"
-            "    float average = (FragColor.r + FragColor.g + FragColor.b) / 3.0;\n"
-            "    FragColor = vec4(average, average, average, 1.0);"
+            "    float rFactor = 0.2126;                             \n"
+            "    float gFactor = 0.7152;                             \n"
+            "    float bFactor = 0.0722;                             \n"
+            "    float average = FragColor.r * rFactor;              \n"
+            "    average += FragColor.g * gFactor;                   \n"
+            "    average += FragColor.b * bFactor;                   \n"
+            "    FragColor = vec4(average, average, average, 1.0);   \n"
             "} ";
 
     shader = Shader(vShaderStr, fShaderStr);
