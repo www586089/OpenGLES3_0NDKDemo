@@ -147,7 +147,7 @@ void FrameBufferSample::init() {
             "void main()                                             \n"
             "{                                                       \n"
             "    vec3 col = texture(screenTexture, TexCoords).rgb;   \n"
-            "    FragColor = vec4(col, 1.0);                         \n"
+            "    FragColor = vec4(vec3(1.0) - col, 1.0);             \n"
             "} ";
 
     shader = Shader(vShaderStr, fShaderStr);
