@@ -7,6 +7,7 @@
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
+//https://blog.csdn.net/wangxingxing321/article/details/107665565?spm=1001.2014.3001.5502
 FrameBufferSample::FrameBufferSample() {
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
@@ -80,6 +81,21 @@ void FrameBufferSample::init() {
             -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
              5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+
+    /**
+     * vertex attributes for a quad that fills
+     * the entire screen in Normalized Device Coordinates.
+     */
+    float quadVertices[] = {
+            // positions   // texCoords
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
+
+            -1.0f,  1.0f,  0.0f, 1.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
+             1.0f,  1.0f,  1.0f, 1.0f
+    };
     char vShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
@@ -108,16 +124,34 @@ void FrameBufferSample::init() {
             "{                                                                 \n"
             "    FragColor = texture(texture1, TexCoords);                     \n"
             "}";
-    char fShaderSingleColorStr[] =
-            "#version 300 es\n"
-            "out vec4 FragColor;\n"
-            "\n"
-            "void main()\n"
-            "{\n"
-            "    FragColor = vec4(0.04, 0.28, 0.26, 1.0);\n"
+    char vScreenShaderStr[] =
+            "#version 300 es                                        \n"
+            "layout (location = 0) in vec2 aPos;                    \n"
+            "layout (location = 1) in vec2 aTexCoords;              \n"
+            "                                                       \n"
+            "out vec2 TexCoords;                                    \n"
+            "                                                       \n"
+            "void main()                                            \n"
+            "{                                                      \n"
+            "    TexCoords = aTexCoords;                            \n"
+            "    gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);      \n"
             "}";
+    char fScreenShaderStr[] =
+            "#version 300 es                                         \n"
+            "out vec4 FragColor;                                     \n"
+            "                                                        \n"
+            "in vec2 TexCoords;                                      \n"
+            "                                                        \n"
+            "uniform sampler2D screenTexture;                        \n"
+            "                                                        \n"
+            "void main()                                             \n"
+            "{                                                       \n"
+            "    vec3 col = texture(screenTexture, TexCoords).rgb;   \n"
+            "    FragColor = vec4(col, 1.0);                         \n"
+            "} ";
+
     shader = Shader(vShaderStr, fShaderStr);
-    colorShader = Shader(vShaderStr, fShaderSingleColorStr);
+    screenShader = Shader(vScreenShaderStr, fScreenShaderStr);
 
     if (shader.isAvailable()) {
         // cube VAO
@@ -154,6 +188,17 @@ void FrameBufferSample::init() {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (offset * sizeof(float)));
         glBindVertexArray(GL_NONE);
 
+        // screen quad VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
 
         // Config Cube Texture
         glGenTextures(1, &cubeTexture);
@@ -173,6 +218,14 @@ void FrameBufferSample::init() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+        // shader configuration
+        // --------------------
+        shader.use();
+        shader.setInt("texture1", 0);
+
+        screenShader.use();
+        screenShader.setInt("screenTexture", 0);
     } else {
         LOGE("FrameBufferSample::Init create program fail");
         return;
@@ -196,15 +249,34 @@ void FrameBufferSample::draw(int screenW, int screenH) {
         firstFrame = false;
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
-
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        // framebuffer configuration
+        // -------------------------
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // create a color attachment texture
+        glGenTextures(1, &textureColorbuffer);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenW, screenH, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+        // create a render buffer object for depth and stencil attachment (we won't be sampling these)
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        // use a single render buffer object for both a depth AND stencil buffer.
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenW, screenH);
+        // now actually attach it
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+        // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            LOGE("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
     int angleX = m_AngleX;
@@ -217,16 +289,38 @@ void FrameBufferSample::draw(int screenW, int screenH) {
 
     // view/projection transformations
     UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
-    // be sure to activate shader when setting uniforms/drawing objects
+    // 1st render scene
+    // ------
+    // bind to framebuffer and draw scene as we normally would to color texture
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+
+    // make sure we clear the framebuffer's content
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     shader.use();
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
-    shader.setInt("texture1", 0);
 
+    // cubes
+    glBindVertexArray(cubeVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.width, cubeImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeImage.ppPlane[0]);
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+    shader.setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // draw floor as normal, but don't write the floor to the stencil buffer,
-    // we only care about the containers. We set its mask to 0x00 to not write to the stencil buffer.
-    glStencilMask(0x00);
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+    shader.setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(GL_NONE);
+
     // floor
     glBindVertexArray(planeVAO);
     glActiveTexture(GL_TEXTURE0);
@@ -238,63 +332,25 @@ void FrameBufferSample::draw(int screenW, int screenH) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(GL_NONE);
 
-    //cubes
-    // 1st. render pass, draw objects as normal, writing to the stencil buffer
-    // --------------------------------------------------------------------
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF);
 
-    glBindVertexArray(cubeVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.width, cubeImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeImage.ppPlane[0]);
-    model = glm::mat4(1.0f);
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-    shader.setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    model = glm::mat4(1.0f);
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-    shader.setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-    // Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing
-    // the objects' size differences, making it look like borders.
-    // -----------------------------------------------------------------------------------------------------------------------------
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilMask(0x00);
+    // 2nd draw from the frame buffer.
+    // now bind back to default framebuffer and draw a quad plane
+    // with the attached framebuffer color texture
+    glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
+    // disable depth test so screen-space quad isn't discarded due to depth test.
     glDisable(GL_DEPTH_TEST);
+    // clear all relevant buffers, set clear color to
+    // white (not really necessary actually, since we
+    // won't be able to see behind the quad anyways)
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    colorShader.use();
-    colorShader.setMat4("view", view);
-    colorShader.setMat4("projection", projection);
-    float scale = 1.02f;
-    // cubes
-
-    glBindVertexArray(cubeVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.width, cubeImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeImage.ppPlane[0]);
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(scale, scale, scale));
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-    colorShader.setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(scale, scale, scale));
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-    colorShader.setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glEnable(GL_DEPTH_TEST);
+    screenShader.use();
+    glBindVertexArray(quadVAO);
+    // use the color attachment texture as the texture of the quad plane
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(GL_NONE);
 }
 
 void FrameBufferSample::loadImage(NativeImage *pImage) {
@@ -328,8 +384,12 @@ void FrameBufferSample::destroy() {
         glDeleteVertexArrays(1, &planeVAO);
         glDeleteBuffers(1, &planeVBO);
 
-        glDeleteTextures(1, &cubeTexture);
         glDeleteBuffers(1, &floorTexture);
+
+        glDeleteTextures(1, &cubeTexture);
+        glDeleteTextures(1, &textureColorbuffer);
+        glDeleteFramebuffers(1, &framebuffer);
+        glDeleteRenderbuffers(1, &rbo);
     }
 }
 

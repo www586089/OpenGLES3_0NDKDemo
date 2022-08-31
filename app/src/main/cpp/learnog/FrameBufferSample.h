@@ -28,10 +28,14 @@ public:
     virtual void loadMultiImageWithIndex(int index, NativeImage *pImage);
 private:
     Shader shader;
-    Shader colorShader;
+    Shader screenShader;
     GLuint cubeVAO, cubeVBO;
     GLuint planeVAO, planeVBO;
+    GLuint quadVAO, quadVBO;
     GLuint cubeTexture, floorTexture;
+    GLuint framebuffer;
+    GLuint textureColorbuffer;
+    GLuint rbo;
     NativeImage cubeImage;
     NativeImage floorImage;
     glm::mat4 model;
@@ -44,11 +48,6 @@ private:
     glm::vec3 lightPos;
 
     glm::mat4 mvpMatrix;
-
-    GLint m_SamplerLoc;
-
-    GLuint m_VaoId;
-    GLuint m_VboIds[1];
 
     int m_AngleX;
     int m_AngleY;
