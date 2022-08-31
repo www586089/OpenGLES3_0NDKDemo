@@ -18,6 +18,7 @@
 #include "ColorBlendTestSample.h"
 #include "FaceCullingSample.h"
 #include "FrameBufferSample.h"
+#include "CubeMapTextureSample.h"
 #include <stdint.h>
 #include <GLES3/gl3.h>
 #include <GeometryInstanced.h>
@@ -211,6 +212,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_FRAME_BUFFER:
                 pCurrentSample = new FrameBufferSample();
+                break;
+            case SAMPLE_CUBE_MAP_TEXTURE:
+                pCurrentSample = new CubeMapTextureSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();

@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Blending",
         "Face Culling",
         "Frame Buffer",
+        "CubeMap Texture",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -239,6 +240,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         }
                     }
                     SAMPLE_FRAME_BUFFER -> {
+                        loadRGBAImage(R.drawable.container)
+                        loadRGBAImage(R.drawable.metal, 0)
+                    }
+                    SAMPLE_CUBE_MAP_TEXTURE -> {
                         loadRGBAImage(R.drawable.container)
                         loadRGBAImage(R.drawable.metal, 0)
                     }
