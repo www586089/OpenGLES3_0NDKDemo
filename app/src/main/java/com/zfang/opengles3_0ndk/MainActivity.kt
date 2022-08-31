@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Color Blend Test",
         "Blending",
         "Face Culling",
+        "Frame Buffer",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -236,6 +237,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         if (sampleType == SAMPLE_COLOR_BLEND_TEST) {
                             loadRGBAImage(R.drawable.blending_transparent_window, 1)
                         }
+                    }
+                    SAMPLE_FRAME_BUFFER -> {
+                        loadRGBAImage(R.drawable.marble)
+                        loadRGBAImage(R.drawable.metal, 0)
                     }
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)

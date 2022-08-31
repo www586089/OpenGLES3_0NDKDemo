@@ -1,19 +1,19 @@
 //
-// Created by Thinkpad on 2022/8/29.
+// Created by Thinkpad on 2022/8/31.
 //
 
-#ifndef OPENGLES3_0NDKDEMO_STENCILBUFFERTESTSAMPLE_H
-#define OPENGLES3_0NDKDEMO_STENCILBUFFERTESTSAMPLE_H
+#ifndef OPENGLES3_0NDKDEMO_FRAMEBUFFERSAMPLE_H
+#define OPENGLES3_0NDKDEMO_FRAMEBUFFERSAMPLE_H
 
 #include <ext/matrix_float4x4.hpp>
 #include "GLSampleBase.h"
 #include "Shader.h"
 
-class StencilBufferTestSample : public GLSampleBase {
+class FrameBufferSample : public GLSampleBase {
 public:
-    StencilBufferTestSample();
+    FrameBufferSample();
 
-    virtual ~StencilBufferTestSample();
+    virtual ~FrameBufferSample();
 
     virtual void init();
     virtual void draw(int screenW, int screenH);
@@ -38,10 +38,11 @@ private:
     glm::mat4 view;
     glm::mat4 projection;
 
+    bool firstFrame = true;
+
     glm::vec3 eyePosition;
     glm::vec3 lightPos;
 
-    bool firstFrame = true;
     glm::mat4 mvpMatrix;
 
     GLint m_SamplerLoc;
@@ -57,4 +58,4 @@ private:
 };
 
 
-#endif //OPENGLES3_0NDKDEMO_STENCILBUFFERTESTSAMPLE_H
+#endif //OPENGLES3_0NDKDEMO_FRAMEBUFFERSAMPLE_H

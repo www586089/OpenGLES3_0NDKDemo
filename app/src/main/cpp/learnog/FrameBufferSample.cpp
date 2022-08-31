@@ -1,23 +1,23 @@
 //
-// Created by Thinkpad on 2022/8/29.
+// Created by Thinkpad on 2022/8/31.
 //
 
-#include "StencilBufferTestSample.h"
+#include "FrameBufferSample.h"
 #include <gtc/matrix_transform.hpp>
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
-StencilBufferTestSample::StencilBufferTestSample() {
+FrameBufferSample::FrameBufferSample() {
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
 }
 
-StencilBufferTestSample::~StencilBufferTestSample() {
+FrameBufferSample::~FrameBufferSample() {
     cubeVAO = GL_NONE;
     cubeVBO = GL_NONE;
 }
 
-void StencilBufferTestSample::init() {
+void FrameBufferSample::init() {
     if (shader.isAvailable()) {
         return;
     }
@@ -174,20 +174,20 @@ void StencilBufferTestSample::init() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
     } else {
-        LOGE("StencilBufferTestSample::Init create program fail");
+        LOGE("FrameBufferSample::Init create program fail");
         return;
     }
 }
 
 
-void StencilBufferTestSample::draw(int screenW, int screenH) {
-    LOGE("StencilBufferTestSample::Draw()");
+void FrameBufferSample::draw(int screenW, int screenH) {
+    LOGE("FrameBufferSample::Draw()");
 
     if (!shader.isAvailable()) {
-        LOGE("StencilBufferTestSample::Draw() return");
+        LOGE("FrameBufferSample::Draw() return");
         return;
     }
-    LOGE("StencilBufferTestSample::Do Draw()");
+    LOGE("FrameBufferSample::Do Draw()");
     // render
     // ------
     // configure global opengl state
@@ -234,7 +234,6 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, floorImage.width, floorImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, floorImage.ppPlane[0]);
     model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     shader.setMat4("model", model/*glm::mat4(1.0f)*/);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(GL_NONE);
@@ -251,14 +250,12 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.width, cubeImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeImage.ppPlane[0]);
     model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
     shader.setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
     shader.setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -284,7 +281,6 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(scale, scale, scale));
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
     colorShader.setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -292,7 +288,6 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(scale, scale, scale));
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
     colorShader.setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -302,8 +297,8 @@ void StencilBufferTestSample::draw(int screenW, int screenH) {
     glEnable(GL_DEPTH_TEST);
 }
 
-void StencilBufferTestSample::loadImage(NativeImage *pImage) {
-    LOGE("StencilBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+void FrameBufferSample::loadImage(NativeImage *pImage) {
+    LOGE("FrameBufferSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
         cubeImage.width = pImage->width;
         cubeImage.height = pImage->height;
@@ -312,8 +307,8 @@ void StencilBufferTestSample::loadImage(NativeImage *pImage) {
     }
 }
 
-void StencilBufferTestSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
-    LOGE("StencilBufferTestSample::LoadImage pImage = %p", pImage->ppPlane[0]);
+void FrameBufferSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
+    LOGE("FrameBufferSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
         if (0 == index) {
             floorImage.width = pImage->width;
@@ -324,7 +319,7 @@ void StencilBufferTestSample::loadMultiImageWithIndex(int index, NativeImage *pI
     }
 }
 
-void StencilBufferTestSample::destroy() {
+void FrameBufferSample::destroy() {
     if (shader.isAvailable()) {
         shader.deleteProgram();
 
@@ -344,8 +339,8 @@ void StencilBufferTestSample::destroy() {
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void StencilBufferTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
-    LOGE("StencilBufferTestSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+void FrameBufferSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
+    LOGE("FrameBufferSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.0f, 100.0f);
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
@@ -361,7 +356,7 @@ void StencilBufferTestSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, 
     );
 }
 
-void StencilBufferTestSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
+void FrameBufferSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
     GLSampleBase::updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     m_AngleX = static_cast<int>(rotateX);
     m_AngleY = static_cast<int>(rotateY);
