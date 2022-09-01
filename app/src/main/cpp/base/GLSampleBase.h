@@ -43,11 +43,12 @@
 #define SAMPLE_FACE_CULLING                     SAMPLE_TYPE + 26
 #define SAMPLE_FRAME_BUFFER                     SAMPLE_TYPE + 27
 #define SAMPLE_CUBE_MAP_TEXTURE                 SAMPLE_TYPE + 28
+#define SAMPLE_TYPE_KEY_SKYBOX                  SAMPLE_TYPE + 29
+
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12
 #define SAMPLE_TYPE_KEY_STENCIL_TESTING         SAMPLE_TYPE + 13
 #define SAMPLE_TYPE_KEY_PARTICLES               SAMPLE_TYPE + 15
-#define SAMPLE_TYPE_KEY_SKYBOX                  SAMPLE_TYPE + 16
 #define SAMPLE_TYPE_KEY_PBO                     SAMPLE_TYPE + 18
 #define SAMPLE_TYPE_KEY_BEATING_HEART           SAMPLE_TYPE + 19
 #define SAMPLE_TYPE_KEY_CLOUD                   SAMPLE_TYPE + 20

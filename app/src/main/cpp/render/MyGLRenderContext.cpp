@@ -30,6 +30,7 @@
 #include <MultiLightsSample2.h>
 #include <Model3DSample.h>
 #include <BlendingSample.h>
+#include <SkyBoxSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -216,6 +217,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_CUBE_MAP_TEXTURE:
                 pCurrentSample = new CubeMapTextureSample();
                 break;
+            case SAMPLE_TYPE_KEY_SKYBOX:
+                pCurrentSample = new SkyBoxSample();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;
@@ -228,9 +232,6 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
 
 //            case SAMPLE_TYPE_KEY_PARTICLES:
 //                pCurrentSample = new ParticlesSample();
-//                break;
-//            case SAMPLE_TYPE_KEY_SKYBOX:
-//                pCurrentSample = new SkyBoxSample();
 //                break;
 //            case SAMPLE_TYPE_KEY_PBO:
 //                pCurrentSample = new PBOSample();

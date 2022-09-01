@@ -27,18 +27,17 @@ public:
 
     virtual void loadImage(NativeImage *pImage);
     virtual void loadMultiImageWithIndex(int index, NativeImage *pImage);
+    GLuint loadCubemap();
 private:
     Shader shader;
-    Shader screenShader;
+    Shader skyBoxShader;
     GLuint cubeVAO, cubeVBO;
-    GLuint planeVAO, planeVBO;
-    GLuint quadVAO, quadVBO;
-    GLuint cubeTexture, floorTexture;
-    GLuint framebuffer;
-    GLuint textureColorbuffer;
-    GLuint rbo;
+    GLuint skyboxVAO, skyboxVBO;
+    GLuint cubeTexture;
+    GLuint cubemapTexture;
     NativeImage cubeImage;
     NativeImage floorImage;
+    NativeImage skyBoxRenderImg[6];
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;

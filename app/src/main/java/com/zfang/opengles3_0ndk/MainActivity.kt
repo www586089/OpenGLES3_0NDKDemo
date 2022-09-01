@@ -67,11 +67,11 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Face Culling",
         "Frame Buffer",
         "CubeMap Texture",
+        "SkyBox",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
         "Particles",
-        "SkyBox",
         "PBO",
         "Beating Heart",
         "Cloud",
@@ -245,7 +245,14 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_CUBE_MAP_TEXTURE -> {
                         loadRGBAImage(R.drawable.container)
-                        loadRGBAImage(R.drawable.metal, 0)
+
+                        loadRGBAImage(R.drawable.right, 0)
+                        loadRGBAImage(R.drawable.left, 1)
+                        loadRGBAImage(R.drawable.top, 2)
+                        loadRGBAImage(R.drawable.bottom, 3)
+                        loadRGBAImage(R.drawable.front, 4)
+                        loadRGBAImage(R.drawable.back, 5)
+
                     }
                     SAMPLE_TYPE_BLENDING -> {
                         loadRGBAImage(R.drawable.board_texture, 0)
@@ -261,12 +268,12 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY)
                     }
                     SAMPLE_TYPE_SKYBOX -> {
-                        loadRGBAImage(R.drawable.right, 0)
-                        loadRGBAImage(R.drawable.left, 1)
-                        loadRGBAImage(R.drawable.top, 2)
-                        loadRGBAImage(R.drawable.bottom, 3)
-                        loadRGBAImage(R.drawable.back, 4)
-                        loadRGBAImage(R.drawable.front, 5)
+                        loadRGBAImage(R.drawable.right, 0)   //POSITIVE_X
+                        loadRGBAImage(R.drawable.left, 1)    //NEGATIVE_X
+                        loadRGBAImage(R.drawable.top, 2)     //POSITIVE_Y
+                        loadRGBAImage(R.drawable.bottom, 3)  //NEGATIVE_Y
+                        loadRGBAImage(R.drawable.front, 4)   //POSITIVE_Z
+                        loadRGBAImage(R.drawable.back, 5)    //NEGATIVE_Z
                     }
                     SAMPLE_TYPE_PBO -> {
                         loadRGBAImage(R.drawable.front)
