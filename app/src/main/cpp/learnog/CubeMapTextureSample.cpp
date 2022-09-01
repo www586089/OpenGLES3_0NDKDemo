@@ -27,48 +27,48 @@ void CubeMapTextureSample::init() {
     // ------------------------------------------------------------------
     float r = 0.2f;
     GLfloat cubeVertices[] = {
-            //positions  // texture Coords
-            -r, -r, -r,  0.0f, 0.0f,
-             r, -r, -r,  1.0f, 0.0f,
-             r,  r, -r,  1.0f, 1.0f,
-             r,  r, -r,  1.0f, 1.0f,
-            -r,  r, -r,  0.0f, 1.0f,
-            -r, -r, -r,  0.0f, 0.0f,
+            //positions  //normal
+            -r, -r, -r,  0.0f,  0.0f, -1.0f,
+             r, -r, -r,  0.0f,  0.0f, -1.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,
+             r,  r, -r,  0.0f,  0.0f, -1.0f,
+            -r,  r, -r,  0.0f,  0.0f, -1.0f,
+            -r, -r, -r,  0.0f,  0.0f, -1.0f,
 
-            -r, -r,  r,  0.0f, 0.0f,
-             r, -r,  r,  1.0f, 0.0f,
-             r,  r,  r,  1.0f, 1.0f,
-             r,  r,  r,  1.0f, 1.0f,
-            -r,  r,  r,  0.0f, 1.0f,
-            -r, -r,  r,  0.0f, 0.0f,
+            -r, -r,  r,  0.0f,  0.0f,  1.0f,
+             r, -r,  r,  0.0f,  0.0f,  1.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,
+             r,  r,  r,  0.0f,  0.0f,  1.0f,
+            -r,  r,  r,  0.0f,  0.0f,  1.0f,
+            -r, -r,  r,  0.0f,  0.0f,  1.0f,
 
-            -r,  r,  r,  1.0f, 0.0f,
-            -r,  r, -r,  1.0f, 1.0f,
-            -r, -r, -r,  0.0f, 1.0f,
-            -r, -r, -r,  0.0f, 1.0f,
-            -r, -r,  r,  0.0f, 0.0f,
-            -r,  r,  r,  1.0f, 0.0f,
+            -r,  r,  r,  1.0f,  0.0f,  0.0f,
+            -r,  r, -r,  1.0f,  0.0f,  0.0f,
+            -r, -r, -r,  1.0f,  0.0f,  0.0f,
+            -r, -r, -r,  1.0f,  0.0f,  0.0f,
+            -r, -r,  r,  1.0f,  0.0f,  0.0f,
+            -r,  r,  r,  1.0f,  0.0f,  0.0f,
 
-             r,  r,  r,  1.0f, 0.0f,
-             r,  r, -r,  1.0f, 1.0f,
-             r, -r, -r,  0.0f, 1.0f,
-             r, -r, -r,  0.0f, 1.0f,
-             r, -r,  r,  0.0f, 0.0f,
-             r,  r,  r,  1.0f, 0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,
+             r,  r, -r,  1.0f,  0.0f,  0.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,
+             r, -r, -r,  1.0f,  0.0f,  0.0f,
+             r, -r,  r,  1.0f,  0.0f,  0.0f,
+             r,  r,  r,  1.0f,  0.0f,  0.0f,
 
-            -r, -r, -r,  0.0f, 1.0f,
-             r, -r, -r,  1.0f, 1.0f,
-             r, -r,  r,  1.0f, 0.0f,
-             r, -r,  r,  1.0f, 0.0f,
-            -r, -r,  r,  0.0f, 0.0f,
-            -r, -r, -r,  0.0f, 1.0f,
+            -r, -r, -r,  0.0f, -1.0f,  0.0f,
+             r, -r, -r,  0.0f, -1.0f,  0.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,
+             r, -r,  r,  0.0f, -1.0f,  0.0f,
+            -r, -r,  r,  0.0f, -1.0f,  0.0f,
+            -r, -r, -r,  0.0f, -1.0f,  0.0f,
 
-            -r,  r, -r,  0.0f, 1.0f,
-             r,  r, -r,  1.0f, 1.0f,
-             r,  r,  r,  1.0f, 0.0f,
-             r,  r,  r,  1.0f, 0.0f,
-            -r,  r,  r,  0.0f, 0.0f,
-            -r,  r, -r,  0.0f, 1.0f
+            -r,  r, -r,  0.0f,  1.0f,  0.0f,
+             r,  r, -r,  0.0f,  1.0f,  0.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,
+             r,  r,  r,  0.0f,  1.0f,  0.0f,
+            -r,  r,  r,  0.0f,  1.0f,  0.0f,
+            -r,  r, -r,  0.0f,  1.0f,  0.0f,
     };
 
     float skyboxA = 2.0f;
@@ -116,12 +116,13 @@ void CubeMapTextureSample::init() {
             -skyboxA, -skyboxA,  skyboxA,
              skyboxA, -skyboxA,  skyboxA
     };
-    char vShaderStr[] =
+    char vCubeShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
-            "layout (location = 1) in vec2 aTexCoords;                         \n"
+            "layout (location = 1) in vec2 aNormal;                         \n"
             "                                                                  \n"
-            "out vec2 TexCoords;                                               \n"
+            "out vec3 Normal;\n"
+            "out vec3 Position;"
             "                                                                  \n"
             "uniform mat4 model;                                               \n"
             "uniform mat4 view;                                                \n"
@@ -129,20 +130,27 @@ void CubeMapTextureSample::init() {
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    TexCoords = aTexCoords;                                       \n"
+            "    Normal = mat3(transpose(inverse(model))) * aNormal;\n"
+            "    Position = vec3(model * vec4(aPos, 1.0));"
             "    gl_Position = projection * view * model * vec4(aPos, 1.0);    \n"
             "}";
-    char fShaderStr[] =
+    char fCubeShaderStr[] =
             "#version 300 es                                                   \n"
             "out vec4 FragColor;                                               \n"
             "                                                                  \n"
-            "in vec2 TexCoords;                                                \n"
-            "                                                                  \n"
-            "uniform sampler2D texture1;                                       \n"
+            "in vec3 Normal;\n"
+            "in vec3 Position;\n"
+            " \n"
+            "uniform vec3 cameraPos;\n"
+            "uniform samplerCube skybox;"
             "                                                                  \n"
             "void main()                                                       \n"
             "{                                                                 \n"
-            "    FragColor = texture(texture1, TexCoords);                     \n"
+            "    float ratio = 1.00 / 1.52;"
+            "    vec3 I = normalize(Position - cameraPos);\n"
+            "    //vec3 R = reflect(I, normalize(Normal));\n"
+            "    vec3 R = refract(I, normalize(Normal), ratio);"
+            "    FragColor = vec4(texture(skybox, R).rgb, 1.0);"
             "}";
     char vSkyBoxShaderStr[] =
             "#version 300 es                                        \n"
@@ -175,7 +183,7 @@ void CubeMapTextureSample::init() {
             "    FragColor = texture(skybox, TexCoords);            \n"
             "}";
 
-    shader = Shader(vShaderStr, fShaderStr);
+    shader = Shader(vCubeShaderStr, fCubeShaderStr);
     skyBoxShader = Shader(vSkyBoxShaderStr, fSkyBoxShaderStr);
 
     if (shader.isAvailable()) {
@@ -190,10 +198,10 @@ void CubeMapTextureSample::init() {
 
         glEnableVertexAttribArray(0);
         GLuint offset = 0;
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (offset * sizeof(float)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (offset * sizeof(float)));
         glEnableVertexAttribArray(1);
         offset += 3;
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (offset * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (offset * sizeof(float)));
         glBindVertexArray(GL_NONE);
 
         // skybox VAO
@@ -277,7 +285,7 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     // render
     // ------
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+//    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -295,17 +303,18 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     // draw scene as normal
     shader.use();
     model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     shader.setMat4("model", model);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
-    shader.setInt("texture1", 0);
+    shader.setVec3("cameraPos", eyePosition);
+    shader.setInt("skybox", 0);
     // cubes
     glBindVertexArray(cubeVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeImage.width, cubeImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeImage.ppPlane[0]);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(GL_NONE);
 
@@ -316,7 +325,7 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
      * change depth function so depth test passes when
      * values are equal to depth buffer's content
      */
-    glDepthFunc(GL_LEQUAL);
+//    glDepthFunc(GL_LEQUAL);
     // ... set view and projection matrix
     model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -331,7 +340,7 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     skyBoxShader.setInt("skybox", 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(GL_NONE);
-    glDepthFunc(GL_LESS); // set depth function back to default
+//    glDepthFunc(GL_LESS); // set depth function back to default
 }
 
 void CubeMapTextureSample::loadImage(NativeImage *pImage) {
@@ -386,8 +395,8 @@ void CubeMapTextureSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
     // View matrix
-    glm::vec3 eyePosition = glm::vec3 (0.0f, 0.8f, 1.5f);
-    glm::vec3 center = glm::vec3 (0, 0, 0);
+    eyePosition = glm::vec3 (0.0f, 0.0f, 1.8f);
+    glm::vec3 center = glm::vec3 (0, 0, -1);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
             eyePosition,   // Camera is at (0,0,1), in World Space
