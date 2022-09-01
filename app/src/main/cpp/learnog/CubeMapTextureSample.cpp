@@ -159,7 +159,7 @@ void CubeMapTextureSample::init() {
             "    TexCoords = aPos;                                  \n"
             "    mat4 mvpMatrix = projection * view * model;        \n"
             "    vec4 pos = mvpMatrix * vec4(aPos, 1.0);            \n"
-            "    gl_Position = pos;                                 \n"
+            "    gl_Position = pos.xyww;                            \n"
             "}  ";
     char fSkyBoxShaderStr[] =
             "#version 300 es                                        \n"
@@ -277,6 +277,7 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     // render
     // ------
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -311,6 +312,11 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
 
 
     skyBoxShader.use();
+    /**
+     * change depth function so depth test passes when
+     * values are equal to depth buffer's content
+     */
+    glDepthFunc(GL_LEQUAL);
     // ... set view and projection matrix
     model = glm::mat4(1.0f);
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -325,6 +331,7 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     skyBoxShader.setInt("skybox", 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(GL_NONE);
+    glDepthFunc(GL_LESS); // set depth function back to default
 }
 
 void CubeMapTextureSample::loadImage(NativeImage *pImage) {
