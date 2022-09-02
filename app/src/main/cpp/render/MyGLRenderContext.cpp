@@ -31,6 +31,7 @@
 #include <Model3DSample.h>
 #include <BlendingSample.h>
 #include <SkyBoxSample.h>
+#include<GLSLSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -219,6 +220,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_TYPE_KEY_SKYBOX:
                 pCurrentSample = new SkyBoxSample();
+                break;
+            case SAMPLE_GLSL:
+                pCurrentSample = new GLSLSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();

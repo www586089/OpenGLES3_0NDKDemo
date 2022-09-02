@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Frame Buffer",
         "CubeMap Texture",
         "SkyBox",
+        "Advanced GLSL Sample",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -231,6 +232,9 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_TYPE_3D_MODEL -> {
                         Log.e("zfang", "load 3d model")
+                    }
+                    SAMPLE_GLSL -> {
+                        Log.e("zfang", "Advanced GLSL Sample")
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
