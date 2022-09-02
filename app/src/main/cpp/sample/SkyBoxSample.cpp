@@ -50,7 +50,7 @@ void SkyBoxSample::init()
             "out vec3 v_texCoord;\n"
             "void main()\n"
             "{\n"
-            "    gl_Position = u_MVPMatrix * vec4(a_position, 1.0);\n"
+            "    gl_Position = vec4(u_MVPMatrix * vec4(a_position, 1.0)).xyww;\n"
             "    v_texCoord = a_position;\n"
             "}";
 

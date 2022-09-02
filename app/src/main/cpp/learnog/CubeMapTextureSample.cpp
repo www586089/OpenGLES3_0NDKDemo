@@ -25,7 +25,7 @@ void CubeMapTextureSample::init() {
     }
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float r = 0.2f;
+    float r = 1.0f;
     GLfloat cubeVertices[] = {
             //positions  //normal
             -r, -r, -r,  0.0f,  0.0f, -1.0f,
@@ -119,7 +119,7 @@ void CubeMapTextureSample::init() {
     char vCubeShaderStr[] =
             "#version 300 es                                                   \n"
             "layout (location = 0) in vec3 aPos;                               \n"
-            "layout (location = 1) in vec2 aNormal;                         \n"
+            "layout (location = 1) in vec3 aNormal;                         \n"
             "                                                                  \n"
             "out vec3 Normal;\n"
             "out vec3 Position;"
@@ -148,8 +148,8 @@ void CubeMapTextureSample::init() {
             "{                                                                 \n"
             "    float ratio = 1.00 / 1.52;"
             "    vec3 I = normalize(Position - cameraPos);\n"
-            "    //vec3 R = reflect(I, normalize(Normal));\n"
-            "    vec3 R = refract(I, normalize(Normal), ratio);"
+            "    vec3 R = reflect(I, normalize(Normal));\n"
+            "    //vec3 R = refract(I, normalize(Normal), ratio);"
             "    FragColor = vec4(texture(skybox, R).rgb, 1.0);"
             "}";
     char vSkyBoxShaderStr[] =
@@ -303,7 +303,8 @@ void CubeMapTextureSample::draw(int screenW, int screenH) {
     // draw scene as normal
     shader.use();
     model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+    float scale = 0.25f;
+    model = glm::scale(model, glm::vec3(scale, scale, scale));
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
     shader.setMat4("model", model);
