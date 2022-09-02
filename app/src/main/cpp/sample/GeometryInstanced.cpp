@@ -143,6 +143,7 @@ void GeometryInstanced::init() {
     glVertexAttribDivisor(3, 1);
     glVertexAttribDivisor(4, 1);
 
+    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
     glBindVertexArray(GL_NONE);
 }
 
@@ -193,7 +194,7 @@ void GeometryInstanced::draw(int screenW, int screenH) {
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, amount);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
     glBindVertexArray(GL_NONE);
 }
 
