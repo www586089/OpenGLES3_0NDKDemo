@@ -31,9 +31,12 @@ public:
 
 private:
     glm::mat4 m_MVPMatrix;
-    glm::mat4 m_ModelMatrix;
-    Shader *shader;
-    GLuint VBO, VAO;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+    Shader *shaderRed, *shaderGreen, *shaderBlue, *shaderYellow;
+    GLuint cubeVBO, cubeVAO;
+    GLuint uboMatrices;
 
     int m_AngleX;
     int m_AngleY;

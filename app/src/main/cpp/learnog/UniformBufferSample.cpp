@@ -4,6 +4,7 @@
 
 #include "UniformBufferSample.h"
 #include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.inl>
 #include "../utils/GLUtils.h"
 
 
@@ -17,7 +18,7 @@ UniformBufferSample::UniformBufferSample() {
     m_ScaleX = 1.0f;
     m_ScaleY = 1.0f;
 
-    shader = nullptr;
+    shaderRed = nullptr;
 }
 
 UniformBufferSample::~UniformBufferSample() {
@@ -25,88 +26,143 @@ UniformBufferSample::~UniformBufferSample() {
 }
 
 void UniformBufferSample::init() {
-    if(shader != nullptr)
+    if(shaderRed != nullptr)
         return;
-    // Point
-//    float vertices[] = {
-//            0.0f,  0.0f, 0.0f,
-//            0.0f,  0.0, -2.0f,
-//            0.0f,  0.0, -4.0f,
-//            0.0f,  0.0, -6.0f,
-//    };
+    float cubeVertices[] = {
+            // positions         
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
 
-    // Triangel
-    float vertices[] = {
-            0.0f,  0.5f, 0.0f,
-            -0.5f,  0.0f, 0.0f,
-            0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
 
-            0.0f,  0.5f, -0.5f,
-            -0.5f,  0.0f, -0.5f,
-            0.5f,  0.0f, -0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
 
-            0.0f,  0.5f, -1.0f,
-            -0.5f,  0.0f, -1.0f,
-            0.5f,  0.0f, -1.0f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
 
-            0.0f,  0.5f, -1.5f,
-            -0.5f,  0.0f, -1.5f,
-            0.5f,  0.0f, -1.5f,
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
 
-            0.0f,  0.5f, -4.5f,
-            -0.5f,  0.0f, -4.5f,
-            0.5f,  0.0f, -4.5f,
-
-            0.0f,  0.5f, -6.5f,
-            -0.5f,  0.0f, -6.5f,
-            0.5f,  0.0f, -6.5f,
+            -0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
     };
 
     char vShaderStr[] =
-            "#version 300 es                                   \n"
-            "precision mediump float;                          \n"
-            "layout (location = 0) in vec3 a_position;         \n"
-            "uniform mat4 u_MVPMatrix;                         \n"
-            "uniform mat4 u_ModelMatrix;                       \n"
-            "void main()                                       \n"
-            "{                                                 \n"
-            "    vec4 position = vec4(a_position, 1.0);        \n"
-            "    gl_Position = u_MVPMatrix * position;         \n"
-            "    gl_PointSize = gl_Position.z;                 \n"
-            "    vec3 fragPos = vec3(u_ModelMatrix * position);\n"
+            "#version 300 es                                 \n"
+            "layout (location = 0) in vec3 aPos;             \n"
+            "                                                \n"
+            "layout (std140) uniform Matrices                \n"
+            "{                                               \n"
+            "    mat4 projection;                            \n"
+            "    mat4 view;                                  \n"
+            "};                                              \n"
+            "uniform mat4 model;                             \n"
+            "                                                \n"
+            "void main()                                     \n"
+            "{                                               \n"
+            "    mat4 mvpMatrix = projection * view * model; \n"
+            "    gl_Position = mvpMatrix * vec4(aPos, 1.0);  \n"
             "}";
 
-    char fShaderStr[] =
-            "#version 300 es                                   \n"
-            "precision mediump float;                          \n"
-            "out vec4 outColor;                                \n"
-            "void main()                                       \n"
-            "{                                                 \n"
-            "    if (gl_FragCoord.x < 720.0) {                 \n"
-            "        outColor = vec4(0.2, 0.3, 0.4, 1.0);      \n"
-            "    } else {                                      \n"
-            "        outColor = vec4(1.0, 0.0, 0.0, 1.0);      \n"
-            "    }                                             \n"
-            "                                                  \n"
+    char fShaderRedStr[] =
+            "#version 300 es                                 \n"
+            "precision mediump float;                        \n"
+            "out vec4 FragColor;                             \n"
+            "                                                \n"
+            "void main()                                     \n"
+            "{                                               \n"
+            "    FragColor = vec4(1.0, 0.0, 0.0, 1.0);       \n"
+            "}";
+    char fShaderGreenStr[] =
+            "#version 300 es                                 \n"
+            "precision mediump float;                        \n"
+            "out vec4 FragColor;                             \n"
+            "                                                \n"
+            "void main()                                     \n"
+            "{                                               \n"
+            "    FragColor = vec4(0.0, 1.0, 0.0, 1.0);       \n"
+            "}";
+    char fShaderBlueStr[] =
+            "#version 300 es                                 \n"
+            "precision mediump float;                        \n"
+            "out vec4 FragColor;                             \n"
+            "                                                \n"
+            "void main()                                     \n"
+            "{                                               \n"
+            "    FragColor = vec4(0.0, 0.0, 1.0, 1.0);       \n"
+            "}";
+    char fShaderYellowStr[] =
+            "#version 300 es                                 \n"
+            "precision mediump float;                        \n"
+            "out vec4 FragColor;                             \n"
+            "                                                \n"
+            "void main()                                     \n"
+            "{                                               \n"
+            "    FragColor = vec4(1.0, 1.0, 0.0, 1.0);       \n"
             "}";
 
-    shader = new Shader(vShaderStr, fShaderStr);
+    shaderRed = new Shader(vShaderStr, fShaderRedStr);
+    shaderGreen = new Shader(vShaderStr, fShaderGreenStr);
+    shaderBlue = new Shader(vShaderStr, fShaderBlueStr);
+    shaderYellow = new Shader(vShaderStr, fShaderYellowStr);
 
-    // Generate VBO Ids and load the VBOs with data
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Generate VAO Id
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // cube VAO
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void *) 0);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-    glBindVertexArray(GL_NONE);
+    // configure a uniform buffer object
+    // ---------------------------------
+    // first. We get the relevant block indices
+    GLuint uniformBlockIndexRed = glGetUniformBlockIndex(shaderRed->getProgram(), "Matrices");
+    GLuint uniformBlockIndexGreen = glGetUniformBlockIndex(shaderGreen->getProgram(), "Matrices");
+    GLuint uniformBlockIndexBlue = glGetUniformBlockIndex(shaderBlue->getProgram(), "Matrices");
+    GLuint uniformBlockIndexYellow = glGetUniformBlockIndex(shaderYellow->getProgram(), "Matrices");
+
+    // then we link each shader's uniform block to this uniform binding point
+    glUniformBlockBinding(shaderRed->getProgram(), uniformBlockIndexRed, 0);
+    glUniformBlockBinding(shaderGreen->getProgram(), uniformBlockIndexGreen, 0);
+    glUniformBlockBinding(shaderBlue->getProgram(), uniformBlockIndexBlue, 0);
+    glUniformBlockBinding(shaderYellow->getProgram(), uniformBlockIndexYellow, 0);
+
+    // Now actually create the buffer
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    // define the range of the buffer that links to a uniform binding point
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
+
 }
 
 void UniformBufferSample::loadImage(NativeImage *pImage) {
@@ -114,67 +170,95 @@ void UniformBufferSample::loadImage(NativeImage *pImage) {
 }
 
 void UniformBufferSample::draw(int screenW, int screenH) {
-    if(shader == nullptr) return;
+    if(shaderRed == nullptr) return;
     LOGE("UniformBufferSample::Draw()");
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
+    float angleX = m_AngleX % 360;
+    float angleY = m_AngleY % 360;
 
-    shader->use();
-    shader->setMat4("u_MVPMatrix", m_MVPMatrix);
-    shader->setMat4("u_ModelMatrix", m_ModelMatrix);
-
-
-    glBindVertexArray(VAO);
-    shader->setInt("texture_diffuse1", 0);
-    glDrawArrays(GL_TRIANGLES, 0, 18);
-    glBindVertexArray(GL_NONE);
+    //转化为弧度角
+    auto radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
+    auto radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
+    // draw 4 cubes
+    // RED
+    glBindVertexArray(cubeVAO);
+    shaderRed->use();
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
+    shaderRed->setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // GREEN
+    shaderGreen->use();
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f)); // move top-right
+    shaderGreen->setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // YELLOW
+    shaderYellow->use();
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f)); // move bottom-left
+    shaderYellow->setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // BLUE
+    shaderBlue->use();
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f)); // move bottom-right
+    shaderBlue->setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void UniformBufferSample::destroy() {
     LOGE("UniformBufferSample::Destroy");
 
-    if (shader != nullptr) {
-        shader->Destroy();
-        delete shader;
-        shader = nullptr;
+    if (shaderRed != nullptr) {
+        shaderRed->Destroy();
+        delete shaderRed;
+        shaderRed = nullptr;
 
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
+        glDeleteVertexArrays(1, &cubeVAO);
+        glDeleteBuffers(1, &cubeVBO);
     }
 }
 
 void UniformBufferSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio) {
     LOGE("UniformBufferSample::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
-    angleX = angleX % 360;
-    angleY = angleY % 360;
-
-    //转化为弧度角
-    float radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
-    float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
-
 
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.1f, 100.0f);
 //    glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 1.0f, m_pModel->GetMaxViewDistance() * 4);
-    glm::mat4 Projection = glm::perspective(45.0f,ratio, 0.1f,100.f);
+    projection = glm::perspective(45.0f, ratio, 0.1f,100.f);
 
     glm::vec3 eye = glm::vec3 (0.0f, 2.0f, 4.0f);
     // View matrix
-    glm::mat4 View = glm::lookAt(
+    view = glm::lookAt(
             eye, // Camera is at (0,0,1), in World Space
             glm::vec3(0, 0, 0), // and looks at the origin
             glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
 
     // Model matrix
-    glm::mat4 Model = glm::mat4(1.0f);
-    Model = glm::scale(Model, glm::vec3(m_ScaleX, m_ScaleY, 1.0f));
-    Model = glm::rotate(Model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
-    Model = glm::rotate(Model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    m_ModelMatrix = Model;
-    mvpMatrix = Projection * View * Model;
+    model = glm::mat4(1.0f);
+    mvpMatrix = projection * view * model;
+
+    // store the projection matrix (we only do this once now) (note: we're not using zoom anymore by changing the FoV)
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void UniformBufferSample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {

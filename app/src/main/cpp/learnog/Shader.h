@@ -189,6 +189,9 @@ public:
         deleteProgram();
     }
 
+    GLuint getProgram() {
+        return ID;
+    }
 
 private:
     unsigned int ID = 0;
