@@ -148,8 +148,8 @@ void CubeMapTextureSample::init() {
             "{                                                                 \n"
             "    float ratio = 1.00 / 1.52;"
             "    vec3 I = normalize(Position - cameraPos);\n"
-            "    vec3 R = reflect(I, normalize(Normal));\n"
-            "    //vec3 R = refract(I, normalize(Normal), ratio);"
+            "    //vec3 R = reflect(I, normalize(Normal));\n"
+            "    vec3 R = refract(I, normalize(Normal), ratio);"
             "    FragColor = vec4(texture(skybox, R).rgb, 1.0);"
             "}";
     char vSkyBoxShaderStr[] =
