@@ -45,6 +45,7 @@
 #define SAMPLE_CUBE_MAP_TEXTURE                 SAMPLE_TYPE + 28
 #define SAMPLE_TYPE_KEY_SKYBOX                  SAMPLE_TYPE + 29
 #define SAMPLE_GLSL                             SAMPLE_TYPE + 30
+#define SAMPLE_UNIFORM_BUFFER                   SAMPLE_TYPE + 31
 
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12
