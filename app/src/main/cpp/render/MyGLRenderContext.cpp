@@ -33,6 +33,7 @@
 #include <SkyBoxSample.h>
 #include<GLSLSample.h>
 #include <UniformBufferSample.h>
+#include<InstancingIDSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -227,6 +228,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_UNIFORM_BUFFER:
                 pCurrentSample = new UniformBufferSample();
+                break;
+            case SAMPLE_INSTANCING_ID:
+                pCurrentSample = new InstancingIDSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
