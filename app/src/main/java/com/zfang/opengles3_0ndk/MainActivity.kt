@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Uniform Buffer Sample",
         "Instancing ID Sample",
         "Instancing Array Sample",
+        "Asteroid ID Sample",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -247,6 +248,9 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_INSTANCING_ARRAY -> {
                         Log.e("zfang", "Instancing Array Sample")
+                    }
+                    SAMPLE_ASTEROID_ID -> {
+                        Log.e("zfang", "Instancing Asteroid ID Sample")
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)

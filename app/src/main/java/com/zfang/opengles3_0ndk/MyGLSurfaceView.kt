@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.view.ScaleGestureDetector
 import android.view.MotionEvent
-import android.view.View.MeasureSpec
 
 class MyGLSurfaceView @JvmOverloads constructor(
     context: Context?,
@@ -48,7 +47,7 @@ class MyGLSurfaceView @JvmOverloads constructor(
                 mPreviousX = x
                 when (gLRender.sampleType) {
                     SAMPLE_TYPE_FBO_LEG, SAMPLE_TYPE_COORD_SYSTEM, SAMPLE_TYPE_BASIC_LIGHTING, SAMPLE_LEARN_PHONG_BASIC, SAMPLE_LEARN_PHONG_MATERIALS,
-                    SAMPLE_LEARN_PHONG_TEXTURE,SAMPLE_MULTILIGHTS, SAMPLE_INSTANCING_ARRAY,
+                    SAMPLE_LEARN_PHONG_TEXTURE,SAMPLE_MULTILIGHTS, SAMPLE_INSTANCING_ARRAY, SAMPLE_ASTEROID_ID,
                     SAMPLE_TYPE_TRANS_FEEDBACK, SAMPLE_TYPE_MULTI_LIGHTS,SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST, SAMPLE_TYPE_BLENDING,
                     SAMPLE_TYPE_DEPTH_TESTING, SAMPLE_FACE_CULLING, SAMPLE_GLSL, SAMPLE_UNIFORM_BUFFER, SAMPLE_INSTANCING_ID,
                     SAMPLE_TYPE_INSTANCING, SAMPLE_TYPE_STENCIL_TESTING, SAMPLE_TYPE_PARTICLES, SAMPLE_CUBE_MAP_TEXTURE,

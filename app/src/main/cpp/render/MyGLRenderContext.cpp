@@ -35,6 +35,7 @@
 #include <UniformBufferSample.h>
 #include<InstancingIDSample.h>
 #include <InstancingArraySample.h>
+#include <InstancingAsteroidIDSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -235,6 +236,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_INSTANCING_ARRAY:
                 pCurrentSample = new InstancingArraySample();
+                break;
+            case SAMPLE_ASTEROID_ID:
+                pCurrentSample = new InstancingAsteroidIDSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
