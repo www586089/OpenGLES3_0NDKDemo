@@ -30,12 +30,15 @@ public:
     void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
 private:
-    int amount = 5000;
+    int amount = 10000;
 
     glm::mat4 m_MVPMatrix;
     glm::mat4 m_ModelMatrix;
-    glm::mat4* modelMatrices;
+    glm::mat4 *modelMatrices;
+    glm::mat4 view;
+    glm::mat4 projection;
     AssimpShader *m_pShader;
+    AssimpShader *asteroidsShader;
     Model *planet;
     Model *rock;
 

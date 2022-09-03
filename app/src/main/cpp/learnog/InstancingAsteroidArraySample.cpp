@@ -47,7 +47,7 @@ void InstancingAsteroidArraySample::init() {
             "    vec3 fragPos = vec3(u_ModelMatrix * position);                             \n"
             "                                                                               \n"
             "    // Ambient                                                                 \n"
-            "    float ambientStrength = 0.25;                                              \n"
+            "    float ambientStrength = 0.55;                                              \n"
             "    ambient = ambientStrength * lightColor;                                    \n"
             "                                                                               \n"
             "    // Diffuse                                                                 \n"
@@ -64,7 +64,49 @@ void InstancingAsteroidArraySample::init() {
             "    float spec = pow(max(dot(unitNormal, reflectDir), 0.0), 16.0);             \n"
             "    specular = specularStrength * spec * lightColor;                           \n"
             "}";
-
+    char vShaderAsteroidsStr[] =
+            "#version 300 es                                   \n"
+            "precision mediump float;                          \n"
+            "layout (location = 0) in vec3 a_position;         \n"
+            "layout (location = 1) in vec3 a_normal;           \n"
+            "layout (location = 2) in vec2 a_texCoord;         \n"
+            "layout (location = 3) in mat4 aInstanceMatrix;    \n"
+            "out vec2 v_texCoord;                              \n"
+            "uniform mat4 view;                                \n"
+            "uniform mat4 projection;                          \n"
+            "uniform mat4 u_ModelMatrix;                       \n"
+            "uniform vec3 lightPos;                            \n"
+            "uniform vec3 lightColor;                          \n"
+            "uniform vec3 viewPos;                             \n"
+            "out vec3 ambient;                                 \n"
+            "out vec3 diffuse;                                 \n"
+            "out vec3 specular;                                \n"
+            "void main()                                                                    \n"
+            "{                                                                              \n"
+            "    mat4 u_MVPMatrix = projection * view * aInstanceMatrix;                    \n"
+            "    v_texCoord = a_texCoord;                                                   \n"
+            "    vec4 position = vec4(a_position, 1.0);                                     \n"
+            "    gl_Position = u_MVPMatrix * position;                                      \n"
+            "    vec3 fragPos = vec3(aInstanceMatrix * position);                           \n"
+            "                                                                               \n"
+            "    // Ambient                                                                 \n"
+            "    float ambientStrength = 0.55;                                              \n"
+            "    ambient = ambientStrength * lightColor;                                    \n"
+            "                                                                               \n"
+            "    // Diffuse                                                                 \n"
+            "    float diffuseStrength = 0.5;                                               \n"
+            "    vec3 unitNormal = normalize(vec3(aInstanceMatrix * vec4(a_normal, 1.0)));  \n"
+            "    vec3 lightDir = normalize(lightPos - fragPos);                             \n"
+            "    float diff = max(dot(unitNormal, lightDir), 0.0);                          \n"
+            "    diffuse = diffuseStrength * diff * lightColor;                             \n"
+            "                                                                               \n"
+            "    // Specular                                                                \n"
+            "    float specularStrength = 0.3;                                              \n"
+            "    vec3 viewDir = normalize(viewPos - fragPos);                               \n"
+            "    vec3 reflectDir = reflect(-lightDir, unitNormal);                          \n"
+            "    float spec = pow(max(dot(unitNormal, reflectDir), 0.0), 16.0);             \n"
+            "    specular = specularStrength * spec * lightColor;                           \n"
+            "}";
     char fShaderStr[] =
             "#version 300 es                                                              \n"
             "precision mediump float;                                                     \n"
@@ -142,15 +184,20 @@ void InstancingAsteroidArraySample::init() {
     } else {
         m_pShader = new AssimpShader(vShaderStr, fNoTextureShaderStr);
     }
+    if (rock->ContainsTextures()) {
+        asteroidsShader = new AssimpShader(vShaderAsteroidsStr, fShaderStr);
+    } else {
+        asteroidsShader = new AssimpShader(vShaderAsteroidsStr, fNoTextureShaderStr);
+    }
 
     modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(GetSysCurrentTimeSec())); // initialize random seed
     float radius = 50.0;
-    float offset = 2.5f;
+    float offset = 3.5f;
     for (unsigned int i = 0; i < amount; i++) {
         glm::mat4 model = glm::mat4(1.0f);
         // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-        float angle = (float)i / (float)amount * 360.0f;
+        float angle = (float)i / (float) amount * 360.0f;
         float displacement = (float) (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
         float x = sin(angle) * radius + displacement;
         displacement = (float) (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
@@ -167,9 +214,41 @@ void InstancingAsteroidArraySample::init() {
         auto rotAngle = static_cast<float>((rand() % 360));
         model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
-        LOGE("modelMatrices[%d] = (%f, %f, %f)" , i, x, y, z);
+        //LOGE("modelMatrices[%d] = (%f, %f, %f)" , i, x, y, z);
         // 4. now add to list of matrices
         modelMatrices[i] = model;
+    }
+
+    // configure instanced array
+    // -------------------------
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+    // set transformation matrices as an instance vertex attribute (with divisor 1)
+    // note: we're cheating a little by taking the, now publicly declared, VAO of the model's mesh(es) and adding new vertexAttribPointers
+    // normally you'd want to do this in a more organized fashion, but for learning purposes this will do.
+    // -----------------------------------------------------------------------------------------------------------------------------------
+    for (unsigned int i = 0; i < rock->meshes.size(); i++) {
+        unsigned int VAO = rock->meshes[i].VAO;
+        glBindVertexArray(VAO);
+        // set attribute pointers for matrix (4 times vec4)
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
     }
 }
 
@@ -180,7 +259,7 @@ void InstancingAsteroidArraySample::loadImage(NativeImage *pImage) {
 void InstancingAsteroidArraySample::draw(int screenW, int screenH) {
     if(planet == nullptr || m_pShader == nullptr) return;
     LOGE("InstancingAsteroidArraySample::Draw()");
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -201,16 +280,21 @@ void InstancingAsteroidArraySample::draw(int screenW, int screenH) {
     m_pShader->setVec3("viewPos", glm::vec3(0, 0, planet->GetMaxViewDistance()));
     planet->Draw((*m_pShader));
 
+
     // draw meteorites
-    for (unsigned int i = 0; i < amount; i++) {
-        m_ModelMatrix = modelMatrices[i];
-        UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
-        m_pShader->setMat4("u_MVPMatrix", m_MVPMatrix);
-        m_pShader->setMat4("u_ModelMatrix", m_ModelMatrix);
-        m_pShader->setVec3("lightPos", glm::vec3(0, 0, rock->GetMaxViewDistance()));
-        m_pShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-        m_pShader->setVec3("viewPos", glm::vec3(0, 0, rock->GetMaxViewDistance()));
-        rock->Draw((*m_pShader));
+    asteroidsShader->use();
+    asteroidsShader->setMat4("view", view);
+    asteroidsShader->setMat4("projection", projection);
+    asteroidsShader->setInt("texture_diffuse1", 0);
+    asteroidsShader->setVec3("lightPos", glm::vec3(0, 0, rock->GetMaxViewDistance()));
+    asteroidsShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    asteroidsShader->setVec3("viewPos", glm::vec3(0, 0, rock->GetMaxViewDistance()));
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, rock->texturesLoaded[0].id); // note: we also made the textures_loaded vector public (instead of private) from the model class.
+    for (auto & mesh : rock->meshes) {
+        glBindVertexArray(mesh.VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(mesh.indices.size()), GL_UNSIGNED_INT, 0, amount);
+        glBindVertexArray(0);
     }
 }
 
@@ -242,14 +326,14 @@ void InstancingAsteroidArraySample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int an
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.1f, 100.0f);
 //    glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 1.0f, planet->GetMaxViewDistance() * 4);
-    glm::mat4 Projection = glm::perspective(45.0f, ratio, 0.1f, 100.f);
+    projection = glm::perspective(45.0f, ratio, 0.1f, 100.f);
 
     float radius = 55.0f;
     float x = radius * cos(radiansY);
     float y = 2.0f;
     float z = radius * sin(radiansY);
     // View matrix
-    glm::mat4 View = glm::lookAt(
+    view = glm::lookAt(
             glm::vec3(x, y, z),/*planet->GetMaxViewDistance() * 1.8f*/ // Camera is at (0,0,1), in World Space
             glm::vec3(0, 0, 0), // and looks at the origin
             glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
@@ -271,7 +355,7 @@ void InstancingAsteroidArraySample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int an
 
 //    m_ModelMatrix = Model;
 //    m_ModelMatrix = glm::rotate(m_ModelMatrix, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    mvpMatrix = Projection * View * m_ModelMatrix;
+    mvpMatrix = projection * view * m_ModelMatrix;
 }
 
 void InstancingAsteroidArraySample::updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
