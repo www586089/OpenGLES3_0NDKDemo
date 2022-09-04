@@ -51,6 +51,7 @@
 #define SAMPLE_ASTEROID_ID                      SAMPLE_TYPE + 34
 #define SAMPLE_ASTEROID_ARRAY                   SAMPLE_TYPE + 35
 #define SAMPLE_PHONG_BLINNLIGHTING              SAMPLE_TYPE + 36
+#define SAMPLE_GAMMA_CORRECTION                 SAMPLE_TYPE + 37
 
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12

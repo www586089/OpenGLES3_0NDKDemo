@@ -38,6 +38,7 @@
 #include <InstancingAsteroidIDSample.h>
 #include <InstancingAsteroidArraySample.h>
 #include <PhongBlinnLightingSample.h>
+#include<GammaCorrectionSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -247,6 +248,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_PHONG_BLINNLIGHTING:
                 pCurrentSample = new PhongBlinnLightingSample();
+                break;
+            case SAMPLE_GAMMA_CORRECTION:
+                pCurrentSample = new GammaCorrectionSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();

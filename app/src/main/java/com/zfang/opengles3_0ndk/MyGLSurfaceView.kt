@@ -53,7 +53,7 @@ class MyGLSurfaceView @JvmOverloads constructor(
                     SAMPLE_LEARN_PHONG_TEXTURE,SAMPLE_MULTILIGHTS, SAMPLE_INSTANCING_ARRAY, SAMPLE_ASTEROID_ID, SAMPLE_ASTEROID_ARRAY,
                     SAMPLE_TYPE_TRANS_FEEDBACK, SAMPLE_TYPE_MULTI_LIGHTS,SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST, SAMPLE_TYPE_BLENDING,
                     SAMPLE_TYPE_DEPTH_TESTING, SAMPLE_FACE_CULLING, SAMPLE_GLSL, SAMPLE_UNIFORM_BUFFER, SAMPLE_INSTANCING_ID, SAMPLE_PHONG_BLINNLIGHTING,
-                    SAMPLE_TYPE_INSTANCING, SAMPLE_TYPE_STENCIL_TESTING, SAMPLE_TYPE_PARTICLES, SAMPLE_CUBE_MAP_TEXTURE,
+                    SAMPLE_TYPE_INSTANCING, SAMPLE_TYPE_STENCIL_TESTING, SAMPLE_TYPE_PARTICLES, SAMPLE_CUBE_MAP_TEXTURE, SAMPLE_GAMMA_CORRECTION,
                     SAMPLE_TYPE_SKYBOX, SAMPLE_TYPE_3D_MODEL, SAMPLE_TYPE_PBO, SAMPLE_TYPE_KEY_VISUALIZE_AUDIO,
                     SAMPLE_TYPE_KEY_UBO, SAMPLE_TYPE_KEY_TEXT_RENDER -> {
                         gLRender.updateTransformMatrix(
@@ -178,10 +178,8 @@ class MyGLSurfaceView @JvmOverloads constructor(
                 run {
                     when (gLRender.sampleType) {
                         SAMPLE_TYPE_KEY_SHOCK_WAVE -> gLRender.setTouchLoc(touchX, touchY)
-                        SAMPLE_PHONG_BLINNLIGHTING -> {
-                            flag++
-                            val tmp = flag % 2
-                            changeStatus(SAMPLE_PHONG_BLINNLIGHTING, tmp)
+                        SAMPLE_PHONG_BLINNLIGHTING, SAMPLE_GAMMA_CORRECTION -> {
+                            changeStatus(gLRender.sampleType, ++flag % 2)
                         }
                         else -> {
                         }
