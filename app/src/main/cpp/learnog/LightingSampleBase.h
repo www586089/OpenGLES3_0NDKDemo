@@ -19,6 +19,7 @@ public:
     }
 
 protected:
+    bool firstFrame = true;
     Shader lightingShader;
     Shader lightCubeShader;
     GLuint VBO, cubeVAO;

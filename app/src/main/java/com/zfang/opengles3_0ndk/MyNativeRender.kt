@@ -38,6 +38,7 @@ val SAMPLE_INSTANCING_ID = SAMPLE_UNIFORM_BUFFER + 1
 val SAMPLE_INSTANCING_ARRAY = SAMPLE_INSTANCING_ID + 1
 val SAMPLE_ASTEROID_ID = SAMPLE_INSTANCING_ARRAY + 1
 val SAMPLE_ASTEROID_ARRAY = SAMPLE_ASTEROID_ID + 1
+val SAMPLE_PHONG_BLINNLIGHTING = SAMPLE_ASTEROID_ARRAY + 1
 
 val SAMPLE_TYPE_DEPTH_TESTING = SAMPLE_TYPE + 11
 val SAMPLE_TYPE_INSTANCING = SAMPLE_TYPE + 12
@@ -100,6 +101,8 @@ class MyNativeRender {
     external fun native_OnDrawFrame()
 
     external fun nativeSetParamsInt(type: Int, first: Int, second: Int)
+    external fun nativeSetParamsFloat(type: Int, first: Float, second: Float)
+    external fun changeStatus(type: Int, status: Int)
 
     external fun updateTransformMatrix(
         rotateX: Float,

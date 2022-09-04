@@ -78,4 +78,7 @@ public class MyGLRender implements GLSurfaceView.Renderer {
         mNativeRender.updateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     }
 
+    public void changeStatus(int type, int flag) {
+        mNativeRender.changeStatus(type, flag);
+    }
 }

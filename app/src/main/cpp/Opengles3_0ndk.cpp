@@ -137,3 +137,17 @@ Java_com_zfang_opengles3_10ndk_egl_NativeEglRender_nativeEglRenderUnInit(JNIEnv 
                                                                          jobject thiz) {
     EGLRender::GetInstance()->UnInit();
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_zfang_opengles3_10ndk_MyNativeRender_nativeSetParamsFloat(JNIEnv *env, jobject thiz,
+                                                                   jint type, jfloat first,
+                                                                   jfloat second) {
+
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_zfang_opengles3_10ndk_MyNativeRender_changeStatus(JNIEnv *env, jobject thiz, jint type,
+                                                           jint status) {
+    MyGLRenderContext::GetInstance()->changeStatus(type, status);
+}

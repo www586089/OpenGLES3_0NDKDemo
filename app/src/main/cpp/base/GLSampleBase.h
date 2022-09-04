@@ -50,6 +50,7 @@
 #define SAMPLE_INSTANCING_ARRAY                 SAMPLE_TYPE + 33
 #define SAMPLE_ASTEROID_ID                      SAMPLE_TYPE + 34
 #define SAMPLE_ASTEROID_ARRAY                   SAMPLE_TYPE + 35
+#define SAMPLE_PHONG_BLINNLIGHTING              SAMPLE_TYPE + 36
 
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12
@@ -115,6 +116,8 @@ public:
     virtual void loadShortArrData(short *const pShortArr, int arrSize) {}
 
     virtual void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {}
+
+    virtual void changeStatus(int type, int flag) {}
 
     virtual void setTouchLocation(float x, float y) {}
 

@@ -37,6 +37,7 @@
 #include <InstancingArraySample.h>
 #include <InstancingAsteroidIDSample.h>
 #include <InstancingAsteroidArraySample.h>
+#include <PhongBlinnLightingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -244,6 +245,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
             case SAMPLE_ASTEROID_ARRAY:
                 pCurrentSample = new InstancingAsteroidArraySample();
                 break;
+            case SAMPLE_PHONG_BLINNLIGHTING:
+                pCurrentSample = new PhongBlinnLightingSample();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;
@@ -379,4 +383,11 @@ void MyGLRenderContext::DestroyInstance() {
         m_pContext = nullptr;
     }
 
+}
+
+void MyGLRenderContext::changeStatus(int type, int flag) {
+    LOGE("MyGLRenderContext::changeStatus, type = %d, flag = %d", type, flag);
+    if (nullptr != pCurrentSample) {
+        pCurrentSample->changeStatus(type, flag);
+    }
 }

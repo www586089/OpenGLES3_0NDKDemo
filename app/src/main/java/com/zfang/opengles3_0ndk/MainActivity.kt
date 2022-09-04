@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Instancing Array Sample",
         "Asteroid ID Sample",
         "Asteroid Array Sample",
+        "Advanced Light Blinn-Phong",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -255,6 +256,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_ASTEROID_ARRAY -> {
                         Log.e("zfang", "Instancing Asteroid ARRAY Sample")
+                    }
+                    SAMPLE_PHONG_BLINNLIGHTING -> {
+                        Log.e("zfang", "Advanced Lighting BlinnLighting")
+                        loadRGBAImage(R.drawable.wood)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)

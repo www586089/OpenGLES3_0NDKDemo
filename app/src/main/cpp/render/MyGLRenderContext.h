@@ -21,6 +21,7 @@ public :
 
     void setParamsInt(int type, int first, int second);
     void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
+    void changeStatus(int type, int flag);
 
     static MyGLRenderContext *GetInstance();
     static void DestroyInstance();
