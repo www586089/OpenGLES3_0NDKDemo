@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Asteroid Array Sample",
         "Advanced Light Blinn-Phong",
         "Gamma Correction Sample",
+        "Shadow Mapping Depth",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -265,6 +266,12 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_GAMMA_CORRECTION -> {
                         Log.e("zfang", "Gamma Correction Sample")
                         loadRGBAImage(R.drawable.wood)
+                    }
+                    SAMPLE_SHADOW_MAPPING_DEPTH -> {
+                        Log.e("zfang", "Shadow Mapping Depth")
+                        loadRGBAImage(R.drawable.marble)
+                        loadRGBAImage(R.drawable.metal, 0)
+                        loadRGBAImage(R.drawable.blending_transparent_window, 1)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
