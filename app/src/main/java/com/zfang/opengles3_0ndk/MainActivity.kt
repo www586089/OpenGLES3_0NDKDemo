@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Advanced Light Blinn-Phong",
         "Gamma Correction Sample",
         "Shadow Mapping Depth",
+        "Shadow Mapping",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -269,6 +270,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_SHADOW_MAPPING_DEPTH -> {
                         Log.e("zfang", "Shadow Mapping Depth")
+                        loadRGBAImage(R.drawable.wood)
+                    }
+                    SAMPLE_SHADOW_MAPPING -> {
+                        Log.e("zfang", "Shadow Mapping")
                         loadRGBAImage(R.drawable.wood)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {

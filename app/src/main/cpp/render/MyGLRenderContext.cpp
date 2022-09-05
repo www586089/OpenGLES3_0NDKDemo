@@ -40,6 +40,7 @@
 #include <PhongBlinnLightingSample.h>
 #include<GammaCorrectionSample.h>
 #include<ShadowMappingDepthSample.h>
+#include<ShadowMappingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -257,6 +258,10 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 pCurrentSample = new ShadowMappingDepthSample();
                     break;
                 }
+            case SAMPLE_SHADOW_MAPPING: {
+                pCurrentSample = new ShadowMappingSample();
+                break;
+            }
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;

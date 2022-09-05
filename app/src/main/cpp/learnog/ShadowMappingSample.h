@@ -2,23 +2,21 @@
 // Created by Thinkpad on 2022/9/5.
 //
 
-#ifndef OPENGLES3_0NDKDEMO_SHADOWMAPPINGDEPTHSAMPLE_H
-#define OPENGLES3_0NDKDEMO_SHADOWMAPPINGDEPTHSAMPLE_H
+#ifndef OPENGLES3_0NDKDEMO_SHADOWMAPPINGSAMPLE_H
+#define OPENGLES3_0NDKDEMO_SHADOWMAPPINGSAMPLE_H
 
 
-//https://blog.csdn.net/wangxingxing321/article/details/107688212?spm=1001.2014.3001.5502
-#include <ext/matrix_float4x4.hpp>
-#include "GLSampleBase.h"
 #include "Shader.h"
+#include <GLSampleBase.h>
 
 /**
- * 可视化深度纹理
+ * 使用深度纹理显示物件阴影
  */
-class ShadowMappingDepthSample : public GLSampleBase {
+class ShadowMappingSample : public GLSampleBase {
 public:
-    ShadowMappingDepthSample();
+    ShadowMappingSample();
 
-    virtual ~ShadowMappingDepthSample();
+    virtual ~ShadowMappingSample();
 
     virtual void init();
     virtual void draw(int screenW, int screenH);
@@ -67,4 +65,5 @@ private:
     float m_ScaleX = 0.3f;
     float m_ScaleY;
 };
-#endif //OPENGLES3_0NDKDEMO_SHADOWMAPPINGDEPTHSAMPLE_H
+
+#endif //OPENGLES3_0NDKDEMO_SHADOWMAPPINGSAMPLE_H
