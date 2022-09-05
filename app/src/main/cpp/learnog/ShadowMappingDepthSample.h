@@ -28,13 +28,21 @@ public:
 
     virtual void loadImage(NativeImage *pImage);
     virtual void loadMultiImageWithIndex(int index, NativeImage *pImage);
+
+    virtual void renderScene(const Shader &shader);
+    virtual void renderCube();
+    virtual void renderQuad();
+    virtual void initShadowMap();
 private:
-    Shader shader;
+    bool firstFrame = true;
+    Shader simpleDepthShader, debugDepthQuadShader;
     GLuint cubeVAO, cubeVBO;
     GLuint planeVAO, planeVBO;
-    GLuint transparentVAO, transparentVBO;
-    GLuint cubeTexture, floorTexture, grassTexture;
-    NativeImage cubeImage;
+    GLuint quadVAO = 0, quadVBO = 0;
+    GLsizei SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    GLuint depthMapFBO;
+    GLuint colorBufferTexture, floorTexture, woodTexture, depthMapTexture;
+    NativeImage woodImage;
     NativeImage floorImage;
     NativeImage grassImage;
     glm::mat4 model;
@@ -42,7 +50,6 @@ private:
     glm::mat4 projection;
 
     glm::vec3 eyePosition;
-    glm::vec3 lightPos;
 
     glm::mat4 mvpMatrix;
 
