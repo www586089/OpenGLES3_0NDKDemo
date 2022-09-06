@@ -77,7 +77,7 @@ void ShadowMappingSample::init() {
             "    //float bias = 0.005;                                           \n"
             "    vec3 lightDir = normalize(lightPos - FragPos);                  \n"
             "    vec3 normal = normalize(Normal);                                \n"
-            "    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  \n"
+            "    float bias = max(0.05 * (1.0 - 0.0), 0.005);  \n"
             "    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0; \n"
             "                                                                    \n"
             "    return shadow;                                                  \n"
@@ -348,7 +348,7 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
 
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // 1. render depth of scene to texture (from light's perspective)
@@ -374,7 +374,9 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, woodTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, woodImage.width, woodImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, woodImage.ppPlane[0]);
+    glCullFace(GL_FRONT);
     renderScene(simpleDepthShader);
+    glCullFace(GL_BACK);
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
