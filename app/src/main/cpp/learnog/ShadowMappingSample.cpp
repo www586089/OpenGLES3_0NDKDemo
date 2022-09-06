@@ -73,12 +73,28 @@ void ShadowMappingSample::init() {
             "    float closestDepth = texture(shadowMap, projCoords.xy).r;       \n"
             "    // get depth of current fragment from light's perspective       \n"
             "    float currentDepth = projCoords.z;                              \n"
+            "    if (currentDepth > 1.0) {                                       \n"
+            "        return 1.0;// some problem                                  \n"
+            "    }                                                               \n"
             "    // check whether current frag pos is in shadow                  \n"
             "    //float bias = 0.005;                                           \n"
             "    vec3 lightDir = normalize(lightPos - FragPos);                  \n"
             "    vec3 normal = normalize(Normal);                                \n"
-            "    float bias = max(0.05 * (1.0 - 0.0), 0.005);  \n"
-            "    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0; \n"
+            "    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);  \n"
+            "    // check whether current frag pos is in shadow                  \n"
+            "    //float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;\n"
+            "    // PCF                                                          \n"
+            "    float shadow = 0.0;                                             \n"
+            "    ivec2 size = textureSize(shadowMap, 0);                         \n"
+            "    vec2 texelSize = vec2(1.0 / float(size.x), 1.0 / float(size.y));\n"
+            "                                                                    \n"
+            "    for(int x = -1; x <= 1; ++x) {                                  \n"
+            "        for(int y = -1; y <= 1; ++y) {                              \n"
+            "            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; \n"
+            "            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;  \n"
+            "        }                                                           \n"
+            "    }                                                               \n"
+            "    shadow /= 9.0;                                                  \n"
             "                                                                    \n"
             "    return shadow;                                                  \n"
             "}                                                                   \n"
@@ -282,8 +298,10 @@ void ShadowMappingSample::initShadowMap() {
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+//    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_CO, borderColor);
 
     // Setup hardware comparison
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
@@ -348,7 +366,7 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
 
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // 1. render depth of scene to texture (from light's perspective)
@@ -374,9 +392,7 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, woodTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, woodImage.width, woodImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, woodImage.ppPlane[0]);
-    glCullFace(GL_FRONT);
     renderScene(simpleDepthShader);
-    glCullFace(GL_BACK);
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
