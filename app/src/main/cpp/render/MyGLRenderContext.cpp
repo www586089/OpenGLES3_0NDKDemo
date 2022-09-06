@@ -41,6 +41,7 @@
 #include<GammaCorrectionSample.h>
 #include<ShadowMappingDepthSample.h>
 #include<ShadowMappingSample.h>
+#include<ShadowCubeMappingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -262,6 +263,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 pCurrentSample = new ShadowMappingSample();
                 break;
             }
+            case SAMPLE_SHADOW_CUBE_MAPPING:
+                pCurrentSample = new ShadowCubeMappingSample();
+                break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
 //                break;

@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Gamma Correction Sample",
         "Shadow Mapping Depth",
         "Shadow Mapping",
+        "Shadow Cube Mapping",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -274,6 +275,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_SHADOW_MAPPING -> {
                         Log.e("zfang", "Shadow Mapping")
+                        loadRGBAImage(R.drawable.wood)
+                    }
+                    SAMPLE_SHADOW_CUBE_MAPPING -> {
+                        Log.e("zfang", "Shadow Cube Mapping")
                         loadRGBAImage(R.drawable.wood)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
