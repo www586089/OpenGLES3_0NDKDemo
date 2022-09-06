@@ -36,7 +36,7 @@ public:
     virtual void initShadowMap();
 private:
     bool firstFrame = true;
-    Shader simpleDepthShader, debugDepthQuadShader;
+    Shader shader, simpleDepthShader, debugDepthQuadShader;
     GLuint cubeVAO, cubeVBO;
     GLuint planeVAO, planeVBO;
     GLuint quadVAO = 0, quadVBO = 0;

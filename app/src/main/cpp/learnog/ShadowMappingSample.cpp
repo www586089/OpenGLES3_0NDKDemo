@@ -25,6 +25,84 @@ void ShadowMappingSample::init() {
     if (simpleDepthShader.isAvailable()) {
         return;
     }
+    char vShaderShadowMap[] =
+            "#version 300 es                                                    \n"
+            "layout (location = 0) in vec3 aPos;                                \n"
+            "layout (location = 1) in vec3 aNormal;                             \n"
+            "layout (location = 2) in vec2 aTexCoords;                          \n"
+            "                                                                   \n"
+            "out vec3 FragPos;                                                  \n"
+            "out vec3 Normal;                                                   \n"
+            "out vec2 TexCoords;                                                \n"
+            "out vec4 FragPosLightSpace;                                        \n"
+            "                                                                   \n"
+            "uniform mat4 projection;                                           \n"
+            "uniform mat4 view;                                                 \n"
+            "uniform mat4 model;                                                \n"
+            "uniform mat4 lightSpaceMatrix;                                     \n"
+            "                                                                   \n"
+            "void main() {                                                      \n"
+            "    FragPos = vec3(model * vec4(aPos, 1.0));                       \n"
+            "    Normal = transpose(inverse(mat3(model))) * aNormal;            \n"
+            "    TexCoords = aTexCoords;                                        \n"
+            "    FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);     \n"
+            "    gl_Position = projection * view * model * vec4(aPos, 1.0);     \n"
+            "}";
+    char fShaderShadowMap[] =
+            "#version 300 es                                                     \n"
+            "out vec4 FragColor;                                                 \n"
+            "                                                                    \n"
+            "in vec3 FragPos;                                                    \n"
+            "in vec3 Normal;                                                     \n"
+            "in vec2 TexCoords;                                                  \n"
+            "in vec4 FragPosLightSpace;                                          \n"
+            "                                                                    \n"
+            "uniform sampler2D diffuseTexture;                                   \n"
+            "uniform sampler2D shadowMap;                                        \n"
+            "                                                                    \n"
+            "uniform vec3 lightPos;                                              \n"
+            "uniform vec3 viewPos;                                               \n"
+            "                                                                    \n"
+            "float ShadowCalculation(vec4 fragPosLightSpace) {                   \n"
+            "    // perform perspective divide                                   \n"
+            "    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  \n"
+            "    // transform to [0,1] range                                     \n"
+            "    projCoords = projCoords * 0.5 + 0.5;                            \n"
+            "    // get closest depth value from light's perspective (using [0,1]\n"
+            "    // range fragPosLight as coords)                                \n"
+            "    float closestDepth = texture(shadowMap, projCoords.xy).r;       \n"
+            "    // get depth of current fragment from light's perspective       \n"
+            "    float currentDepth = projCoords.z;                              \n"
+            "    // check whether current frag pos is in shadow                  \n"
+            "    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;        \n"
+            "                                                                    \n"
+            "    return shadow;                                                  \n"
+            "}                                                                   \n"
+            "                                                                    \n"
+            "void main() {                                                       \n"
+            "    vec3 color = texture(diffuseTexture, TexCoords).rgb;            \n"
+            "    vec3 normal = normalize(Normal);                                \n"
+            "    vec3 lightColor = vec3(0.6);                                    \n"
+            "    // ambient                                                      \n"
+            "    vec3 ambient = 0.3 * lightColor;                                \n"
+            "    // diffuse                                                      \n"
+            "    vec3 lightDir = normalize(lightPos - FragPos);                  \n"
+            "    float diff = max(dot(lightDir, normal), 0.0);                   \n"
+            "    vec3 diffuse = diff * lightColor;                               \n"
+            "    // specular                                                     \n"
+            "    vec3 viewDir = normalize(viewPos - FragPos);                    \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                   \n"
+            "    float spec = 0.0;                                               \n"
+            "    vec3 halfwayDir = normalize(lightDir + viewDir);                \n"
+            "    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);            \n"
+            "    vec3 specular = spec * lightColor;                              \n"
+            "    // calculate shadow                                             \n"
+            "    float shadow = ShadowCalculation(FragPosLightSpace);            \n"
+            "    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);  \n"
+            "    vec3 lighting = result * color;                                 \n"
+            "                                                                    \n"
+            "    FragColor = vec4(lighting, 1.0);                                \n"
+            "}";
     char vShaderShadowMapDepthStr[] =
             "#version 300 es                                                  \n"
             "layout (location = 0) in vec3 aPos;                              \n"
@@ -36,10 +114,10 @@ void ShadowMappingSample::init() {
             "    gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);    \n"
             "}";
     char fShaderShadowMapDepthStr[] =
-            "#version 300 es                                                   \n"
-            "void main()                                                       \n"
-            "{                                                                 \n"
-            "    //empty shader only for depth Texture                         \n"
+            "#version 300 es                                                  \n"
+            "void main()                                                      \n"
+            "{                                                                \n"
+            "    //empty shader only for depth Texture                        \n"
             "}";
 
     char vShaderDebugQuadStr[] =
@@ -76,6 +154,7 @@ void ShadowMappingSample::init() {
             "    FragColor = vec4(vec3(depthValue), 1.0); // orthographic\n"
             "    //FragColor = texture(depthMapTexture, TexCoords);     \n"
             "}";
+    shader = Shader(vShaderShadowMap, fShaderShadowMap);
     simpleDepthShader = Shader(vShaderShadowMapDepthStr, fShaderShadowMapDepthStr);
     debugDepthQuadShader = Shader(vShaderDebugQuadStr, fShaderDebugQuadStr);
 
@@ -165,6 +244,9 @@ void ShadowMappingSample::init() {
 
         // shader configuration
         // --------------------
+        shader.use();
+        shader.setInt("diffuseTexture", 0);
+        shader.setInt("shadowMap", 1);
         debugDepthQuadShader.use();
         debugDepthQuadShader.setInt("depthMapTexture", 0);
 
@@ -194,8 +276,10 @@ void ShadowMappingSample::initShadowMap() {
 
     glGenTextures(1, &depthMapTexture);
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Setup hardware comparison
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
@@ -271,7 +355,7 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
     // lighting info
     // -------------
-    glm::vec3 lightPos(-2.0f, 5.0f, -1.0f);
+    glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     lightSpaceMatrix = lightProjection * lightView;
     UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
@@ -290,9 +374,23 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
-    // reset viewport
+
+    // 2. render scene as normal using the generated depth/shadow map
+    // --------------------------------------------------------------
     glViewport(0, 0, screenW, screenH);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shader.use();
+    shader.setMat4("projection", projection);
+    shader.setMat4("view", view);
+    // set light uniforms
+    shader.setVec3("viewPos", eyePosition);
+    shader.setVec3("lightPos", lightPos);
+    shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, woodTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+    renderScene(shader);
 
     // render Depth map to quad for visual debugging
     // ---------------------------------------------
@@ -301,34 +399,33 @@ void ShadowMappingSample::draw(int screenW, int screenH) {
     debugDepthQuadShader.setFloat("farPlane", farPlane);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, woodImage.width, woodImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, woodImage.ppPlane[0]);
-    renderQuad();
+    //renderQuad();
 }
 
 // renders the 3D scene
 // --------------------
-void ShadowMappingSample::renderScene(const Shader &shader) {
+void ShadowMappingSample::renderScene(const Shader &cShader) {
     // floor
     glm::mat4 localModel = glm::mat4(1.0f);
-    shader.setMat4("model", localModel);
+    cShader.setMat4("model", localModel);
     glBindVertexArray(planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // cubes
     localModel = glm::mat4(1.0f);
     localModel = glm::translate(localModel, glm::vec3(0.0f, 1.5f, 0.0));
     localModel = glm::scale(localModel, glm::vec3(0.5f));
-    shader.setMat4("model", localModel);
+    cShader.setMat4("model", localModel);
     renderCube();
     localModel = glm::mat4(1.0f);
     localModel = glm::translate(localModel, glm::vec3(2.0f, 0.0f, 1.0));
     localModel = glm::scale(localModel, glm::vec3(0.5f));
-    shader.setMat4("model", localModel);
+    cShader.setMat4("model", localModel);
     renderCube();
     localModel = glm::mat4(1.0f);
     localModel = glm::translate(localModel, glm::vec3(-1.0f, 0.0f, 2.0));
     localModel = glm::rotate(localModel, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
     localModel = glm::scale(localModel, glm::vec3(0.25));
-    shader.setMat4("model", localModel);
+    cShader.setMat4("model", localModel);
     renderCube();
 }
 
@@ -487,10 +584,11 @@ void ShadowMappingSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int 
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
 
     float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
-    float lightX = 2.2f * cos(radiansY);
-    float lightZ = 2.2f * sin(radiansY);
+    float lightX = 10.2f * cos(radiansY);
+    float lightZ = 10.2f * sin(radiansY);
     // View matrix
     eyePosition = glm::vec3 (lightX, 6.0f, lightZ);
+    //eyePosition = glm::vec3(0, 5.5, 10.5);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(
