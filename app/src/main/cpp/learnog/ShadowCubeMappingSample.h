@@ -33,15 +33,17 @@ public:
     virtual void renderCube();
     virtual void renderQuad();
     virtual void initShadowMap();
+    virtual void initShadowMap2();
 private:
     bool firstFrame = true;
+    bool shadows = true;
     Shader shader, simpleDepthShader, debugDepthQuadShader;
     GLuint cubeVAO, cubeVBO;
     GLuint planeVAO, planeVBO;
     GLuint quadVAO = 0, quadVBO = 0;
     GLsizei SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     GLuint depthMapFBO;
-    GLuint colorBufferTexture, floorTexture, woodTexture, depthMapTexture;
+    GLuint colorBufferTexture, floorTexture, woodTexture, depthCubeMapTexture;
     NativeImage woodImage;
     NativeImage floorImage;
     NativeImage grassImage;
@@ -63,6 +65,7 @@ private:
 
     float m_ScaleX = 0.3f;
     float m_ScaleY;
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
 #endif //OPENGLES3_0NDKDEMO_SHADOWCUBEMAPPINGSAMPLE_H
