@@ -26,167 +26,92 @@ void NormalMappingSample::init() {
     if (lightingShader.isAvailable()) {
         return;
     }
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    GLfloat r = 0.5f;
-    GLfloat vertices[] = {
-            //vertex     normal               // texture coord
-            -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-             r, -r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-             r,  r, -r,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-            -r,  r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-            -r, -r, -r,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-            -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-             r, -r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-             r,  r,  r,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-            -r,  r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-            -r, -r,  r,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-
-            -r,  r,  r, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-            -r,  r, -r, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-            -r, -r, -r, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -r, -r, -r, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -r, -r,  r, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-            -r,  r,  r, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-             r,  r, -r,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             r, -r, -r,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             r, -r,  r,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-             r,  r,  r,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-            -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-             r, -r, -r,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-             r, -r,  r,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-            -r, -r,  r,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-            -r, -r, -r,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-            -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-             r,  r, -r,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-             r,  r,  r,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-            -r,  r,  r,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-            -r,  r, -r,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-    };
-
     char lightingVShaderStr[] =
-            "#version 300 es                                                   \n"
-            "layout (location = 0) in vec3 aPos;                               \n"
-            "layout (location = 1) in vec3 aNormal;                            \n"
-            "layout (location = 2) in vec2 aTexCoords;\n"
-            "                                                                  \n"
-            "uniform mat4 model;                                               \n"
-            "uniform mat4 view;                                                \n"
-            "uniform mat4 projection;                                          \n"
-            "                                                                  \n"
-            "out vec3 FragPos;                                                 \n"
-            "out vec3 Normal;                                                  \n"
-            "out vec2 TexCoords;\n"
-            "                                                                  \n"
-            "void main()                                                       \n"
-            "{                                                                 \n"
-            "    FragPos = vec3(model * vec4(aPos, 1.0));                      \n"
-            "    gl_Position = projection * view * vec4(FragPos, 1.0);         \n"
-            "    Normal = aNormal;                                             \n"
-            "    TexCoords = aTexCoords;\n"
+            "#version 300 es                                                 \n"
+            "layout (location = 0) in vec3 aPos;                             \n"
+            "layout (location = 1) in vec3 aNormal;                          \n"
+            "layout (location = 2) in vec2 aTexCoords;                       \n"
+            "layout (location = 3) in vec3 aTangent;                         \n"
+            "layout (location = 4) in vec3 aBitangent;                       \n"
+            "                                                                \n"
+            "out vec3 FragPos;                                               \n"
+            "out vec2 TexCoords;                                             \n"
+            "out vec3 TangentLightPos;                                       \n"
+            "out vec3 TangentViewPos;                                        \n"
+            "out vec3 TangentFragPos;                                        \n"
+            "                                                                \n"
+            "uniform mat4 projection;                                        \n"
+            "uniform mat4 view;                                              \n"
+            "uniform mat4 model;                                             \n"
+            "                                                                \n"
+            "uniform vec3 lightPos;                                          \n"
+            "uniform vec3 viewPos;                                           \n"
+            "                                                                \n"
+            "void main() {                                                   \n"
+            "    FragPos = vec3(model * vec4(aPos, 1.0));                    \n"
+            "    TexCoords = aTexCoords;                                     \n"
+            "                                                                \n"
+            "    mat3 normalMatrix = transpose(inverse(mat3(model)));        \n"
+            "    vec3 T = normalize(normalMatrix * aTangent);                \n"
+            "    vec3 N = normalize(normalMatrix * aNormal);                 \n"
+            "    T = normalize(T - dot(T, N) * N);                           \n"
+            "    vec3 B = cross(N, T);                                       \n"
+            "                                                                \n"
+            "    mat3 TBN = transpose(mat3(T, B, N));                        \n"
+            "    TangentLightPos = TBN * lightPos;                           \n"
+            "    TangentViewPos  = TBN * viewPos;                            \n"
+            "    TangentFragPos  = TBN * FragPos;                            \n"
+            "                                                                \n"
+            "    gl_Position = projection * view * model * vec4(aPos, 1.0);  \n"
             "}";
 
     char lightingFShaderStr[] =
-            "#version 300 es                                         \n"
-            "struct Material {                                       \n"
-            "    sampler2D  diffuse;                                       \n"
-            "    sampler2D specular;                                      \n"
-            "    float shininess;                                    \n"
-            "};                                                      \n"
-            "struct Light {                                          \n"
-            "    vec3 position;                                      \n"
-            "                                                        \n"
-            "    vec3 ambient;                                       \n"
-            "    vec3 diffuse;                                       \n"
-            "    vec3 specular;                                      \n"
-            "};                                                      \n"
-            "out vec4 FragColor;                                     \n"
-            "                                                        \n"
-            "uniform vec3 objectColor;                               \n"
-            "uniform vec3 viewPos;                                   \n"
-            "uniform Material material;                              \n"
-            "uniform Light light;                                    \n"
-            "                                                        \n"
-            "in vec3 FragPos;                                        \n"
-            "in vec3 Normal;                                         \n"
-            "in vec2 TexCoords;\n"
-            "                                                        \n"
-            "void main()                                             \n"
-            "{                                                       \n"
-            "    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;    \n"
-            "                                                        \n"
-            "    vec3 normal = normalize(Normal);                    \n"
-            "    vec3 lightDir = normalize(light.position - FragPos);\n"
-            "    float diff = max(dot(normal, lightDir), 0.0);       \n"
-            "    vec3 diffuse = light.diffuse * (texture(material.diffuse, TexCoords).rgb * diff);                     \n"
-            "                                                                                  \n"
-            "    vec3 viewDir = normalize(viewPos - FragPos);                                  \n"
-            "    vec3 reflectDir = reflect(-lightDir, normal);                                 \n"
-            "    float spec = pow(max(dot(viewDir, reflectDir), 0.0),  material.shininess);    \n"
-            "    vec3 specular =  light.specular * (texture(material.specular, TexCoords).rgb * spec);                 \n"
-            "                                                                                  \n"
-            "    vec3 result = (ambient + diffuse + specular);                   \n"
-            "    FragColor = vec4(result, 1.0);                                                \n"
-            "}                                                                                 \n"
-    ;
-
-    char lightingCubeVShaderStr[] =
             "#version 300 es                                                   \n"
-            "layout (location = 0) in vec3 aPos;                               \n"
+            "out vec4 FragColor;                                               \n"
             "                                                                  \n"
-            "uniform mat4 model;                                               \n"
-            "uniform mat4 view;                                                \n"
-            "uniform mat4 projection;                                          \n"
+            "in vec3 FragPos;                                                  \n"
+            "in vec2 TexCoords;                                                \n"
+            "in vec3 TangentLightPos;                                          \n"
+            "in vec3 TangentViewPos;                                           \n"
+            "in vec3 TangentFragPos;                                           \n"
             "                                                                  \n"
-            "void main()                                                       \n"
-            "{                                                                 \n"
-            "    gl_Position = projection * view * model * vec4(aPos, 1.0);    \n"
+            "uniform sampler2D diffuseMap;                                     \n"
+            "uniform sampler2D normalMap;                                      \n"
+            "                                                                  \n"
+            "uniform vec3 lightPos;                                            \n"
+            "uniform vec3 viewPos;                                             \n"
+            "                                                                  \n"
+            "void main() {                                                     \n"
+            "     // obtain normal from normal map in range [0,1]              \n"
+            "    vec3 normal = texture(normalMap, TexCoords).rgb;              \n"
+            "    // transform normal vector to range [-1,1]                    \n"
+            "    //// this normal is in tangent space                          \n"
+            "    normal = normalize(normal * 2.0 - 1.0);                       \n"
+            "                                                                  \n"
+            "    // get diffuse color                                          \n"
+            "    vec3 color = texture(diffuseMap, TexCoords).rgb;              \n"
+            "    // ambient                                                    \n"
+            "    vec3 ambient = 0.1 * color;                                   \n"
+            "    // diffuse                                                    \n"
+            "    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);  \n"
+            "    float diff = max(dot(lightDir, normal), 0.0);                 \n"
+            "    vec3 diffuse = diff * color;                                  \n"
+            "    // specular                                                   \n"
+            "    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);    \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);                 \n"
+            "    vec3 halfwayDir = normalize(lightDir + viewDir);              \n"
+            "    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);    \n"
+            "                                                                  \n"
+            "    vec3 specular = vec3(0.2) * spec;                             \n"
+            "    FragColor = vec4(ambient + diffuse + specular, 1.0);          \n"
             "}";
-    char lightingCubeFShaderStr[] =
-            "#version 300 es                                                  \n"
-            "out vec4 FragColor;                                              \n"
-            "                                                                 \n"
-            "void main()                                                      \n"
-            "{                                                                \n"
-            "    FragColor = vec4(1.0); // set alle 4 vector values to 1.0    \n"
-            "}";
-    GLchar const * varyings[] = {"Normal"};
-    lightingShader = Shader(lightingVShaderStr, lightingFShaderStr, varyings, sizeof(varyings) / sizeof(varyings[0]));
-    lightCubeShader = Shader(lightingCubeVShaderStr, lightingCubeFShaderStr);
 
-    if (lightingShader.isAvailable() && lightCubeShader.isAvailable()) {
+    lightingShader = Shader(lightingVShaderStr, lightingFShaderStr);
 
-        //创建 Transform Feedback 缓存类似于创建 VBO
-        glGenBuffers(1, &m_TransFeedbackBufId);
-        glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_TransFeedbackBufId);
-        glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, 3 * 6 * 6 * sizeof(GLfloat), NULL, GL_STATIC_READ);
-        glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
-
-        //为 Transform Feedback 对象绑定缓冲区对象
-        glGenTransformFeedbacks(1, &m_TransFeedbackObjId);
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TransFeedbackObjId);
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_TransFeedbackBufId); // Specify the index of the binding point within the array specified by target.
-        glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-        glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
-
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
+    if (lightingShader.isAvailable()) {
         // Config Diffuse Map
-        glGenTextures(1, &textureDiffuse);
-        glBindTexture(GL_TEXTURE_2D, textureDiffuse);
+        glGenTextures(1, &diffuseMap);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -194,49 +119,108 @@ void NormalMappingSample::init() {
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
 
-        // Config Specular Map
-        glGenTextures(1, &textureSpecular);
-        glBindTexture(GL_TEXTURE_2D, textureSpecular);
+        // Config Normal Map
+        glGenTextures(1, &normalMap);
+        glBindTexture(GL_TEXTURE_2D, normalMap);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-        // first, configure the cube's VAO (and VBO)
-        glGenVertexArrays(1, &cubeVAO);
-        glBindVertexArray(cubeVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        // position attribute
-        glEnableVertexAttribArray(0);
-        GLuint offset = 0;
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof(GLfloat)));
-        // normal attribute
-        glEnableVertexAttribArray(1);
-        offset += 3;
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof (GLfloat)));
-        //texture coordinate
-        glEnableVertexAttribArray(2);
-        offset += 3;
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof (GLfloat)));
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        glBindVertexArray(GL_NONE);
-
-        // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-        glGenVertexArrays(1, &lightCubeVAO);
-        glBindVertexArray(lightCubeVAO);
-        // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it;
-        // the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        offset = 0;
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*) (offset * sizeof(GLfloat)));
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        glBindVertexArray(GL_NONE);
+        lightingShader.use();
+        lightingShader.setInt("diffuseMap", 0);
+        lightingShader.setInt("normalMap", 1);
     } else {
         LOGE("NormalMappingSample::Init create program fail");
         return;
     }
+}
+
+void NormalMappingSample::renderQuad() {
+    if (quadVAO == 0) {
+        // positions
+        glm::vec3 pos1(-1.0f,  1.0f, 0.0f);
+        glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
+        glm::vec3 pos3( 1.0f, -1.0f, 0.0f);
+        glm::vec3 pos4( 1.0f,  1.0f, 0.0f);
+        // texture coordinates
+        glm::vec2 uv1(0.0f, 1.0f);
+        glm::vec2 uv2(0.0f, 0.0f);
+        glm::vec2 uv3(1.0f, 0.0f);
+        glm::vec2 uv4(1.0f, 1.0f);
+        // normal vector
+        glm::vec3 nm(0.0f, 0.0f, 1.0f);
+
+        // calculate tangent/bitangent vectors of both triangles
+        glm::vec3 tangent1, bitangent1;
+        glm::vec3 tangent2, bitangent2;
+        // triangle 1
+        // ----------
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        glm::vec2 deltaUV1 = uv2 - uv1;
+        glm::vec2 deltaUV2 = uv3 - uv1;
+
+        float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+        // triangle 2
+        // ----------
+        edge1 = pos3 - pos1;
+        edge2 = pos4 - pos1;
+        deltaUV1 = uv3 - uv1;
+        deltaUV2 = uv4 - uv1;
+
+        f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+
+        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+
+        float quadVertices[] = {
+                // positions            // normal         // texcoords  // tangent                          // bitangent
+                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+                pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+                pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+        };
+        // configure plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(GL_NONE);
 }
 
 
@@ -254,10 +238,10 @@ void NormalMappingSample::loadMultiImageWithIndex(int index, NativeImage *pImage
     LOGE("NormalMappingSample::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage) {
         if (0 == index) {
-            specularImage.width = pImage->width;
-            specularImage.height = pImage->height;
-            specularImage.format = pImage->format;
-            NativeImageUtil::CopyNativeImage(pImage, &specularImage);
+            normalImage.width = pImage->width;
+            normalImage.height = pImage->height;
+            normalImage.format = pImage->format;
+            NativeImageUtil::CopyNativeImage(pImage, &normalImage);
         }
     }
 }
@@ -265,109 +249,40 @@ void NormalMappingSample::loadMultiImageWithIndex(int index, NativeImage *pImage
 void NormalMappingSample::draw(int screenW, int screenH) {
     LOGE("NormalMappingSample::Draw()");
 
-    if (!lightingShader.isAvailable() || !lightCubeShader.isAvailable()) {
+    if (!lightingShader.isAvailable()) {
         LOGE("NormalMappingSample::Draw() return");
         return;
     }
-    LOGE("NormalMappingSample::Do Draw()");
+    // render
+    // ------
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / (float) screenH);
 
-    int angleX = m_AngleX;
-    int angleY = m_AngleY;
-    angleX = angleX % 360;
-    angleY = angleY % 360;
-    //转化为弧度角
-    float radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
-    float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
-
-    // view/projection transformations
-    UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
-    // be sure to activate shader when setting uniforms/drawing objects
+    // configure view/projection matrices
     lightingShader.use();
-    lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("viewPos", eyePosition);
-    // set materials
-    lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-//    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-    lightingShader.setFloat("material.shininess", 32.0f);
-    // set Light
-    glm::vec3 lightColor;
-    lightColor.x = static_cast<float>(sin(radiansY * 2.0));
-    lightColor.y = static_cast<float>(sin(radiansY * 0.7));
-    lightColor.z = static_cast<float>(sin(radiansY * 1.3));
-    glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f); // decrease the influence
-    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-    lightingShader.setVec3("light.ambient",  /*ambientColor*/0.2f, 0.2f, 0.2f);
-    lightingShader.setVec3("light.diffuse",  /*diffuseColor*/0.5f, 0.5f, 0.5f); // darken diffuse light a bit
-    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3("light.position", lightPos);
-
-    // world transformation
-    model = glm::mat4(1.0f);
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-    lightingShader.setMat4("model", model);
-    // view/projection transformations
     lightingShader.setMat4("projection", projection);
     lightingShader.setMat4("view", view);
-
-    //upload RGBA image data Diffuse
+    // render normal-mapped quad
+    lightingShader.setMat4("model", model);
+    lightingShader.setVec3("viewPos", eyePosition);
+    lightingShader.setVec3("lightPos", lightPos);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureDiffuse);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseImage.width, diffuseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseImage.ppPlane[0]);
-    glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-    //upload RGBA image data Specular
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureSpecular);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, specularImage.width, specularImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, specularImage.ppPlane[0]);
-    glBindTexture(GL_TEXTURE_2D, GL_NONE);
-
-    // render the cube
-    glBindVertexArray(cubeVAO);
-    // Bind the RGBA map
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureDiffuse);
-    lightingShader.setInt("material.diffuse", 0);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureSpecular);
-    lightingShader.setInt("material.specular", 1);
+    glBindTexture(GL_TEXTURE_2D, normalMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, normalImage.width, normalImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, normalImage.ppPlane[0]);
+    renderQuad();
 
-    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_TransFeedbackObjId);
-    glBeginTransformFeedback(GL_TRIANGLES);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glEndTransformFeedback();
-    glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, GL_NONE);
-    glBindVertexArray(GL_NONE);
-
-    // Read feedback buffer
-    glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, m_TransFeedbackBufId);
-    void* rawData = glMapBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 3 * 6 * 6 * sizeof(GLfloat), GL_MAP_READ_BIT);
-
-    float *p = (float*) rawData;
-    for(int i= 0; i < 36; i++) {
-        LOGE("NormalMappingSample::Draw() read feedback buffer Normal[%d] = [%f, %f, %f]",
-             i, p[i * 3], p[i * 3 + 1], p[i * 3 + 2]);
-    }
-
-    glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
-    glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
-
-    // also draw the lamp object
-    lightCubeShader.use();
+    // render light source (simply re-renders a smaller plane at the light's position for debugging/visualization)
     model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(m_ScaleX, m_ScaleX, m_ScaleX));
-    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f)); //绕Y轴旋转
     model = glm::translate(model, lightPos);
-    lightCubeShader.setMat4("model", model);
-    lightCubeShader.setMat4("view", view);
-    lightCubeShader.setMat4("projection", projection);
-
-    glBindVertexArray(lightCubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(GL_NONE);
+    model = glm::scale(model, glm::vec3(0.1f));
+    model = glm::rotate(model, static_cast<float>(MATH_PI / 3.0), glm::vec3(0, 1, 0));
+    lightingShader.setMat4("model", model);
+    renderQuad();
 }
 
 void NormalMappingSample::destroy() {
@@ -394,13 +309,22 @@ void NormalMappingSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int 
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.0f, 100.0f);
     //glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 4.0f, 100.0f);
-    float radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
+    angleX = angleX % 360;
+    angleY = angleY % 360;
+
+    //转化为弧度角
+    auto radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
+    auto radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
     float lightX = 2.8f * sin(radiansY);
     float lightZ = 2.8f * cos(radiansY);
-    lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
+    //lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+
     // View matrix
-    eyePosition = glm::vec3 (1.6f, 3.0f, 2.0f);
+    eyePosition = glm::vec3 (0.0f, 0.0f, 3.0f);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(

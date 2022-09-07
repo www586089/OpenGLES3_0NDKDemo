@@ -284,7 +284,8 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_NORMAL_MAPPING -> {
                         Log.e("zfang", "Normal Mapping")
-                        loadRGBAImage(R.drawable.wood)
+                        loadRGBAImage(R.drawable.brickwall)
+                        loadRGBAImage(R.drawable.brickwall_normal, 0)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
