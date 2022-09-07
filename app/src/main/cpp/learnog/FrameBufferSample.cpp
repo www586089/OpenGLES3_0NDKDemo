@@ -144,39 +144,36 @@ void FrameBufferSample::init() {
             "                                                        \n"
             "uniform sampler2D screenTexture;                        \n"
             "                                                        \n"
-            " \n"
-            "const float offset = 1.0 / 300.0;  \n"
-            " \n"
-            "void main()\n"
-            "{\n"
-            "    vec2 offsets[9] = vec2[](\n"
-            "        vec2(-offset,  offset), // top-left\n"
-            "        vec2( 0.0f,    offset), // top-center\n"
-            "        vec2( offset,  offset), // top-right\n"
-            "        vec2(-offset,  0.0f),   // center-left\n"
-            "        vec2( 0.0f,    0.0f),   // center-center\n"
-            "        vec2( offset,  0.0f),   // center-right\n"
-            "        vec2(-offset, -offset), // bottom-left\n"
-            "        vec2( 0.0f,   -offset), // bottom-center\n"
-            "        vec2( offset, -offset)  // bottom-right    \n"
-            "    );\n"
-            " \n"
-            "    float kernel[9] = float[](\n"
-            "        1.0,  1.0, 1.0, \n"
-            "        1.0, -8.0, 1.0, \n"
-            "        1.0,  1.0, 1.0  \n"
-            "    );"
-            "    \n"
-            "    vec3 sampleTex[9];\n"
-            "    for(int i = 0; i < 9; i++)\n"
-            "    {\n"
+            "const float offset = 1.0 / 300.0;                       \n"
+            "                                                        \n"
+            "void main() {                                           \n"
+            "    vec2 offsets[9] = vec2[](                           \n"
+            "        vec2(-offset,  offset), // top-left             \n"
+            "        vec2( 0.0f,    offset), // top-center           \n"
+            "        vec2( offset,  offset), // top-right            \n"
+            "        vec2(-offset,  0.0f),   // center-left          \n"
+            "        vec2( 0.0f,    0.0f),   // center-center        \n"
+            "        vec2( offset,  0.0f),   // center-right         \n"
+            "        vec2(-offset, -offset), // bottom-left          \n"
+            "        vec2( 0.0f,   -offset), // bottom-center        \n"
+            "        vec2( offset, -offset)  // bottom-right         \n"
+            "    );                                                  \n"
+            "                                                        \n"
+            "    float kernel[9] = float[](                          \n"
+            "        1.0,  1.0, 1.0,                                 \n"
+            "        1.0, -8.0, 1.0,                                 \n"
+            "        1.0,  1.0, 1.0                                  \n"
+            "    );                                                  \n"
+            "                                                        \n"
+            "    vec3 sampleTex[9];                                  \n"
+            "    for(int i = 0; i < 9; i++) {                        \n"
             "        sampleTex[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));\n"
-            "    }\n"
-            "    vec3 col = vec3(0.0);\n"
-            "    for(int i = 0; i < 9; i++)\n"
-            "        col += sampleTex[i] * kernel[i];\n"
-            "    \n"
-            "    FragColor = vec4(col, 1.0);\n"
+            "    }                                                   \n"
+            "    vec3 col = vec3(0.0);                               \n"
+            "    for(int i = 0; i < 9; i++)                          \n"
+            "        col += sampleTex[i] * kernel[i];                \n"
+            "                                                        \n"
+            "    FragColor = vec4(col, 1.0);                         \n"
             "}  ";
 
     shader = Shader(vShaderStr, fShaderStr);
@@ -282,14 +279,14 @@ void FrameBufferSample::draw(int screenW, int screenH) {
         // -------------------------
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        // create a color attachment texture
+        // 1 create a color attachment texture
         glGenTextures(1, &textureColorbuffer);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenW, screenH, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-        // create a render buffer object for depth and stencil attachment (we won't be sampling these)
+        // 2 create a render buffer object for depth and stencil attachment (we won't be sampling these)
         glGenRenderbuffers(1, &rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
         // use a single render buffer object for both a depth AND stencil buffer.
