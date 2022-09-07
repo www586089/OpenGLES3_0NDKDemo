@@ -25,7 +25,7 @@ public:
     virtual void destroy();
 
     virtual void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
-
+    virtual void changeStatus(int type, int flag);
     void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
 private:

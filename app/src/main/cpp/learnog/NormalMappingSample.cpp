@@ -26,6 +26,62 @@ void NormalMappingSample::init() {
     if (lightingShader.isAvailable()) {
         return;
     }
+    char vNoNormalShaderStr[] =
+            "#version 300 es                                                 \n"
+            "layout (location = 0) in vec3 aPos;                             \n"
+            "layout (location = 1) in vec3 aNormal;                          \n"
+            "layout (location = 2) in vec2 aTexCoords;                       \n"
+            "                                                                \n"
+            "out vec3 FragPos;                                               \n"
+            "out vec2 TexCoords;                                             \n"
+            "out vec3 Normal;"
+            "                                                                \n"
+            "uniform mat4 projection;                                        \n"
+            "uniform mat4 view;                                              \n"
+            "uniform mat4 model;                                             \n"
+            "                                                                \n"
+            "void main() {                                                   \n"
+            "    FragPos = vec3(model * vec4(aPos, 1.0));                    \n"
+            "    TexCoords = aTexCoords;                                     \n"
+            "    Normal = normalize(aNormal);\n"
+            "                                                                \n"
+            "    gl_Position = projection * view * model * vec4(aPos, 1.0);  \n"
+            "}";
+
+    char fNoNormalShaderStr[] =
+            "#version 300 es                                                 \n"
+            "out vec4 FragColor;                                             \n"
+            "                                                                \n"
+            "in vec3 FragPos;                                                \n"
+            "in vec2 TexCoords;                                              \n"
+            "in vec3 Normal;                                                 \n"
+            "                                                                \n"
+            "uniform sampler2D diffuseMap;                                   \n"
+            "                                                                \n"
+            "uniform vec3 lightPos;                                          \n"
+            "uniform vec3 viewPos;                                           \n"
+            "                                                                \n"
+            "void main() {                                                   \n"
+            "    // obtain normal from normal map in range [0,1]             \n"
+            "    vec3 normal = normalize(Normal);                            \n"
+            "                                                                \n"
+            "    // get diffuse color                                        \n"
+            "    vec3 color = texture(diffuseMap, TexCoords).rgb;            \n"
+            "    // ambient                                                  \n"
+            "    vec3 ambient = 0.1 * color;                                 \n"
+            "    // diffuse                                                  \n"
+            "    vec3 lightDir = normalize(lightPos - FragPos);              \n"
+            "    float diff = max(dot(lightDir, normal), 0.0);               \n"
+            "    vec3 diffuse = diff * color;                                \n"
+            "    // specular                                                 \n"
+            "    vec3 viewDir = normalize(viewPos - FragPos);                \n"
+            "    vec3 reflectDir = reflect(-lightDir, normal);               \n"
+            "    vec3 halfwayDir = normalize(lightDir + viewDir);            \n"
+            "    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);  \n"
+            "                                                                \n"
+            "    vec3 specular = vec3(0.2) * spec;                           \n"
+            "    FragColor = vec4(ambient + diffuse + specular, 1.0);        \n"
+            "}";
     char lightingVShaderStr[] =
             "#version 300 es                                                 \n"
             "layout (location = 0) in vec3 aPos;                             \n"
@@ -107,7 +163,7 @@ void NormalMappingSample::init() {
             "}";
 
     lightingShader = Shader(lightingVShaderStr, lightingFShaderStr);
-
+    noNormalMappingShader = Shader(vNoNormalShaderStr, fNoNormalShaderStr);
     if (lightingShader.isAvailable()) {
         // Config Diffuse Map
         glGenTextures(1, &diffuseMap);
@@ -131,6 +187,9 @@ void NormalMappingSample::init() {
         lightingShader.use();
         lightingShader.setInt("diffuseMap", 0);
         lightingShader.setInt("normalMap", 1);
+
+        noNormalMappingShader.use();
+        noNormalMappingShader.setInt("diffuseMap", 0);
     } else {
         LOGE("NormalMappingSample::Init create program fail");
         return;
@@ -260,14 +319,19 @@ void NormalMappingSample::draw(int screenW, int screenH) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / (float) screenH);
 
+    if (normalMapping) {
+        pShader = &lightingShader;
+    } else {
+        pShader = &noNormalMappingShader;
+    }
     // configure view/projection matrices
-    lightingShader.use();
-    lightingShader.setMat4("projection", projection);
-    lightingShader.setMat4("view", view);
+    pShader->use();
+    pShader->setMat4("projection", projection);
+    pShader->setMat4("view", view);
     // render normal-mapped quad
-    lightingShader.setMat4("model", model);
-    lightingShader.setVec3("viewPos", eyePosition);
-    lightingShader.setVec3("lightPos", lightPos);
+    pShader->setMat4("model", model);
+    pShader->setVec3("viewPos", eyePosition);
+    pShader->setVec3("lightPos", lightPos);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseImage.width, diffuseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseImage.ppPlane[0]);
@@ -281,8 +345,16 @@ void NormalMappingSample::draw(int screenW, int screenH) {
     model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.1f));
     model = glm::rotate(model, static_cast<float>(MATH_PI / 3.0), glm::vec3(0, 1, 0));
-    lightingShader.setMat4("model", model);
+    pShader->setMat4("model", model);
     renderQuad();
+}
+
+void NormalMappingSample::changeStatus(int type, int flag) {
+    if (flag == 0) {
+        normalMapping = true;
+    } else {
+        normalMapping = false;
+    }
 }
 
 void NormalMappingSample::destroy() {
@@ -296,6 +368,7 @@ void NormalMappingSample::destroy() {
         glDeleteTextures(1, &textureDiffuse);
         glDeleteTextures(1, &textureSpecular);
     }
+    pShader = NULL;
 }
 
 
