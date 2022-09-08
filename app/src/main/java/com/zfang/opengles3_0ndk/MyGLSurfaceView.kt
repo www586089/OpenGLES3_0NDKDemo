@@ -178,7 +178,7 @@ class MyGLSurfaceView @JvmOverloads constructor(
                 run {
                     when (gLRender.sampleType) {
                         SAMPLE_TYPE_KEY_SHOCK_WAVE -> gLRender.setTouchLoc(touchX, touchY)
-                        SAMPLE_PHONG_BLINNLIGHTING, SAMPLE_GAMMA_CORRECTION, SAMPLE_NORMAL_MAPPING -> {
+                        SAMPLE_PHONG_BLINNLIGHTING, SAMPLE_GAMMA_CORRECTION, SAMPLE_NORMAL_MAPPING, SAMPLE_PARALLAX_MAPPING -> {
                             changeStatus(gLRender.sampleType, ++flag % 2)
                         }
                         else -> {

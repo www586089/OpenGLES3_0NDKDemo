@@ -33,7 +33,7 @@ public:
 
 private:
     Shader *pShader = NULL;
-    bool normalMapping = true;
+    bool parallaxMapping = true;
     glm::vec3 lightPos = glm::vec3(0.5f, 1.0f, 0.3f);
     GLuint diffuseMap, normalMap, depthMap;
     GLuint quadVAO = 0, quadVBO = 0;
