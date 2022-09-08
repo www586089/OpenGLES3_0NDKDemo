@@ -132,19 +132,35 @@ void ParallaxMappingSample::init() {
             "                                                                  \n"
             "uniform sampler2D diffuseMap;                                     \n"
             "uniform sampler2D normalMap;                                      \n"
+            "uniform sampler2D depthMap;                                       \n"
+            "uniform float heightScale;                                        \n"
             "                                                                  \n"
             "uniform vec3 lightPos;                                            \n"
             "uniform vec3 viewPos;                                             \n"
             "                                                                  \n"
+            "vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {              \n"
+            "    float height =  texture(depthMap, texCoords).r;               \n"
+            "    return texCoords - viewDir.xy * (height * heightScale);       \n"
+            "}                                                                 \n"
+            "                                                                  \n"
             "void main() {                                                     \n"
+            "    // offset texture coordinates with Parallax Mapping           \n"
+            "    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);    \n"
+            "    vec2 texCoords = TexCoords;                                   \n"
+            "                                                                  \n"
+            "    texCoords = ParallaxMapping(texCoords,  viewDir);             \n"
+            "    if(texCoords.x > 1.0 || texCoords.y > 1.0                     \n"
+            "        || texCoords.x < 0.0 || texCoords.y < 0.0) {              \n"
+            "        discard;                                                  \n"
+            "    }                                                             \n"
             "     // obtain normal from normal map in range [0,1]              \n"
-            "    vec3 normal = texture(normalMap, TexCoords).rgb;              \n"
+            "    vec3 normal = texture(normalMap, texCoords).rgb;              \n"
             "    // transform normal vector to range [-1,1]                    \n"
             "    //// this normal is in tangent space                          \n"
             "    normal = normalize(normal * 2.0 - 1.0);                       \n"
             "                                                                  \n"
             "    // get diffuse color                                          \n"
-            "    vec3 color = texture(diffuseMap, TexCoords).rgb;              \n"
+            "    vec3 color = texture(diffuseMap, texCoords).rgb;              \n"
             "    // ambient                                                    \n"
             "    vec3 ambient = 0.1 * color;                                   \n"
             "    // diffuse                                                    \n"
@@ -152,7 +168,7 @@ void ParallaxMappingSample::init() {
             "    float diff = max(dot(lightDir, normal), 0.0);                 \n"
             "    vec3 diffuse = diff * color;                                  \n"
             "    // specular                                                   \n"
-            "    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);    \n"
+            "  //vec3 viewDir = normalize(TangentViewPos - TangentFragPos);    \n"
             "    vec3 reflectDir = reflect(-lightDir, normal);                 \n"
             "    vec3 halfwayDir = normalize(lightDir + viewDir);              \n"
             "    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);    \n"
@@ -183,9 +199,19 @@ void ParallaxMappingSample::init() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
+        // Config Depth Map
+        glGenTextures(1, &depthMap);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
         lightingShader.use();
         lightingShader.setInt("diffuseMap", 0);
         lightingShader.setInt("normalMap", 1);
+        lightingShader.setInt("depthMap", 2);
 
         noNormalMappingShader.use();
         noNormalMappingShader.setInt("diffuseMap", 0);
@@ -300,6 +326,11 @@ void ParallaxMappingSample::loadMultiImageWithIndex(int index, NativeImage *pIma
             normalImage.height = pImage->height;
             normalImage.format = pImage->format;
             NativeImageUtil::CopyNativeImage(pImage, &normalImage);
+        } else if (1 == index) {
+            depthMapImage.width = pImage->width;
+            depthMapImage.height = pImage->height;
+            depthMapImage.format = pImage->format;
+            NativeImageUtil::CopyNativeImage(pImage, &depthMapImage);
         }
     }
 }
@@ -327,16 +358,20 @@ void ParallaxMappingSample::draw(int screenW, int screenH) {
     pShader->use();
     pShader->setMat4("projection", projection);
     pShader->setMat4("view", view);
-    // render normal-mapped quad
+    // render parallax-mapped quad
     pShader->setMat4("model", model);
     pShader->setVec3("viewPos", eyePosition);
     pShader->setVec3("lightPos", lightPos);
+    pShader->setFloat("heightScale", 1.0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseImage.width, diffuseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuseImage.ppPlane[0]);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, normalMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, normalImage.width, normalImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, normalImage.ppPlane[0]);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, depthMapImage.width, depthMapImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, depthMapImage.ppPlane[0]);
     renderQuad();
 
     // render light source (simply re-renders a smaller plane at the light's position for debugging/visualization)

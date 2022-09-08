@@ -35,11 +35,11 @@ private:
     Shader *pShader = NULL;
     bool normalMapping = true;
     glm::vec3 lightPos = glm::vec3(0.5f, 1.0f, 0.3f);
-    GLuint diffuseMap, normalMap;
+    GLuint diffuseMap, normalMap, depthMap;
     GLuint quadVAO = 0, quadVBO = 0;
     int m_AngleX;
     int m_AngleY;
-    NativeImage normalImage;
+    NativeImage normalImage, depthMapImage;
     Shader noNormalMappingShader;
 
     float m_ScaleX = 0.3f;
