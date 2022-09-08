@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Shadow Mapping",
         "Shadow Cube Mapping",
         "Normal Mapping",
+        "Parallax Mapping",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -284,6 +285,11 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_NORMAL_MAPPING -> {
                         Log.e("zfang", "Normal Mapping")
+                        loadRGBAImage(R.drawable.brickwall)
+                        loadRGBAImage(R.drawable.brickwall_normal, 0)
+                    }
+                    SAMPLE_PARALLAX_MAPPING -> {
+                        Log.e("zfang", "Parallax Mapping")
                         loadRGBAImage(R.drawable.brickwall)
                         loadRGBAImage(R.drawable.brickwall_normal, 0)
                     }
