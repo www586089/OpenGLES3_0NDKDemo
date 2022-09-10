@@ -55,7 +55,7 @@ class MyGLSurfaceView @JvmOverloads constructor(
                     SAMPLE_TYPE_DEPTH_TESTING, SAMPLE_FACE_CULLING, SAMPLE_GLSL, SAMPLE_UNIFORM_BUFFER, SAMPLE_INSTANCING_ID, SAMPLE_PHONG_BLINNLIGHTING,
                     SAMPLE_TYPE_INSTANCING, SAMPLE_TYPE_STENCIL_TESTING, SAMPLE_TYPE_PARTICLES, SAMPLE_CUBE_MAP_TEXTURE, SAMPLE_GAMMA_CORRECTION,SAMPLE_NORMAL_MAPPING,
                     SAMPLE_TYPE_SKYBOX, SAMPLE_TYPE_3D_MODEL, SAMPLE_TYPE_PBO, SAMPLE_TYPE_KEY_VISUALIZE_AUDIO,SAMPLE_SHADOW_MAPPING,SAMPLE_SHADOW_CUBE_MAPPING,
-                    SAMPLE_TYPE_KEY_UBO, SAMPLE_TYPE_KEY_TEXT_RENDER, SAMPLE_PARALLAX_MAPPING -> {
+                    SAMPLE_TYPE_KEY_UBO, SAMPLE_TYPE_KEY_TEXT_RENDER, SAMPLE_PARALLAX_MAPPING, HDR_TOME_MAPPING -> {
                         gLRender.updateTransformMatrix(
                             mXAngle.toFloat(),
                             mYAngle.toFloat(),
@@ -178,7 +178,7 @@ class MyGLSurfaceView @JvmOverloads constructor(
                 run {
                     when (gLRender.sampleType) {
                         SAMPLE_TYPE_KEY_SHOCK_WAVE -> gLRender.setTouchLoc(touchX, touchY)
-                        SAMPLE_PHONG_BLINNLIGHTING, SAMPLE_GAMMA_CORRECTION, SAMPLE_NORMAL_MAPPING, SAMPLE_PARALLAX_MAPPING -> {
+                        SAMPLE_PHONG_BLINNLIGHTING, SAMPLE_GAMMA_CORRECTION, SAMPLE_NORMAL_MAPPING, SAMPLE_PARALLAX_MAPPING, HDR_TOME_MAPPING -> {
                             changeStatus(gLRender.sampleType, ++flag % 2)
                         }
                         else -> {

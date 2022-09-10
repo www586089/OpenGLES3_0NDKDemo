@@ -44,6 +44,7 @@
 #include<ShadowCubeMappingSample.h>
 #include<NormalMappingSample.h>
 #include<ParallaxMappingSample.h>
+#include<HDRToneMappingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -273,6 +274,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_PARALLAX_MAPPING:
                 pCurrentSample = new ParallaxMappingSample();
+                break;
+            case HDR_TOME_MAPPING:
+                pCurrentSample = new HDRToneMappingSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();

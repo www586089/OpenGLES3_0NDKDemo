@@ -57,6 +57,7 @@
 #define SAMPLE_SHADOW_CUBE_MAPPING              SAMPLE_TYPE + 40
 #define SAMPLE_NORMAL_MAPPING                   SAMPLE_TYPE + 41
 #define SAMPLE_PARALLAX_MAPPING                 SAMPLE_TYPE + 42
+#define HDR_TOME_MAPPING                        SAMPLE_TYPE + 43
 
 #define SAMPLE_TYPE_KEY_DEPTH_TESTING           SAMPLE_TYPE + 11
 #define SAMPLE_TYPE_KEY_INSTANCING              SAMPLE_TYPE + 12

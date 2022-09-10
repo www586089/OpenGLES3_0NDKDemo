@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Shadow Cube Mapping",
         "Normal Mapping",
         "Parallax Mapping",
+        "HDR Tone Mapping",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -293,6 +294,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                         loadRGBAImage(R.drawable.bricks2)
                         loadRGBAImage(R.drawable.bricks2_normal, 0)
                         loadRGBAImage(R.drawable.bricks2_disp, 1)
+                    }
+                    HDR_TOME_MAPPING -> {
+                        Log.e("zfang", "HDR Tone Mapping")
+                        loadRGBAImage(R.drawable.wood)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
