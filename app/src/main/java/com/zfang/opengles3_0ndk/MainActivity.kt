@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Normal Mapping",
         "Parallax Mapping",
         "HDR Tone Mapping",
+        "Bloom Blur",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -297,6 +298,10 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     HDR_TOME_MAPPING -> {
                         Log.e("zfang", "HDR Tone Mapping")
+                        loadRGBAImage(R.drawable.wood)
+                    }
+                    SAMPLE_BLOOM_BLUR -> {
+                        Log.e("zfang", "Bloom Blur")
                         loadRGBAImage(R.drawable.wood)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {

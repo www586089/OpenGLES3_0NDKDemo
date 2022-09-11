@@ -45,6 +45,7 @@
 #include<NormalMappingSample.h>
 #include<ParallaxMappingSample.h>
 #include<HDRToneMappingSample.h>
+#include<BloomBlurSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -277,6 +278,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case HDR_TOME_MAPPING:
                 pCurrentSample = new HDRToneMappingSample();
+                break;
+            case SAMPLE_BLOOM_BLUR:
+                pCurrentSample = new BloomBlurSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
