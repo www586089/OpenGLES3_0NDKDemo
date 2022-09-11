@@ -33,18 +33,26 @@ public:
     void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
 private:
-    Shader hdrShader;
     Shader shader;
+    Shader shaderLight;
+    Shader shaderBlur;
+    Shader shaderBloomFinal;
     bool firstFrame = true;
-    GLuint woodTexture = -1;
+    GLuint woodTexture = -1, containerTexture = -1;
     GLuint quadVAO = 0, quadVBO = 0;
     GLuint cubeVAO = 0, cubeVBO = 0;
+
     GLuint hdrFBO = 0;
-    GLuint colorBuffer = 0;
+    GLuint rboDepth = 0;
+    GLuint colorBuffers[2] = {0};
+
+    GLuint pingpongFBO[2] = {0};
+    GLuint pingpongColorBuffers[2] = {0};
     GLuint rboDepthBuffer = 0;
     int m_AngleX = 0;
     int m_AngleY = 0;
     NativeImage woodImage;
+    NativeImage containerImage;
 
     float farthestLightPosZ = 20.0f;
     float m_ScaleX = 0.3f;

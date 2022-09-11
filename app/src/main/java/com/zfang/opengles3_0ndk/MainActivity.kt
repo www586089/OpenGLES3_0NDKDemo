@@ -303,6 +303,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     SAMPLE_BLOOM_BLUR -> {
                         Log.e("zfang", "Bloom Blur")
                         loadRGBAImage(R.drawable.wood)
+                        loadRGBAImage(R.drawable.texture_diffuse, 0)
                     }
                     SAMPLE_DEPTH_BUFFER_TEST, SAMPLE_STENCIL_BUFFER_TEST, SAMPLE_COLOR_BLEND_TEST -> {
                         loadRGBAImage(R.drawable.marble)
