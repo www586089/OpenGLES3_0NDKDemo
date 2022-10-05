@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
         "Parallax Mapping",
         "HDR Tone Mapping",
         "Bloom Blur",
+        "Deferred Shading",
         "Depth Testing",
         "Instancing",
         "Stencil Testing",
@@ -302,6 +303,11 @@ class MainActivity : AppCompatActivity(), AudioCollector.Callback, OnGlobalLayou
                     }
                     SAMPLE_BLOOM_BLUR -> {
                         Log.e("zfang", "Bloom Blur")
+                        loadRGBAImage(R.drawable.wood)
+                        loadRGBAImage(R.drawable.texture_diffuse, 0)
+                    }
+                    SAMPLE_Deferr_Shading -> {
+                        Log.e("zfang", "Deferr_Shading Shading")
                         loadRGBAImage(R.drawable.wood)
                         loadRGBAImage(R.drawable.texture_diffuse, 0)
                     }

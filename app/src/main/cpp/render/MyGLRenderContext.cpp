@@ -46,6 +46,7 @@
 #include<ParallaxMappingSample.h>
 #include<HDRToneMappingSample.h>
 #include<BloomBlurSample.h>
+#include<DeferredShadingSample.h>
 
 MyGLRenderContext *MyGLRenderContext::m_pContext = nullptr;
 
@@ -281,6 +282,9 @@ void MyGLRenderContext::setParamsInt(int type, int first, int second) {
                 break;
             case SAMPLE_BLOOM_BLUR:
                 pCurrentSample = new BloomBlurSample();
+                break;
+            case SAMPLE_Deferr_Shading:
+                pCurrentSample = new DeferredShadingSample();
                 break;
 //            case SAMPLE_TYPE_KEY_DEPTH_TESTING:
 //                pCurrentSample = new DepthTestingSample();
