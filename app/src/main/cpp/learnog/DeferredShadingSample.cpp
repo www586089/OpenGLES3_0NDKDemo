@@ -5,6 +5,8 @@
 #include "DeferredShadingSample.h"
 #include <gtc/matrix_transform.hpp>
 #include <vector>
+#include <model.h>
+#include <gtc/type_ptr.hpp>
 #include "../utils/GLUtils.h"
 #include "Shader.h"
 
@@ -43,228 +45,218 @@ DeferredShadingSample::~DeferredShadingSample() {
 }
 
 void DeferredShadingSample::init() {
-    if (shader.isAvailable()) {
+    if (shaderGeometryPass.isAvailable()) {
         return;
     }
-    char vBloomShaderStr[] =
+    char gBufferVS[] =
             "#version 300 es                                                     \n"
-            "layout (location = 0) in vec3 aPos;                                 \n"
-            "layout (location = 1) in vec3 aNormal;                              \n"
-            "layout (location = 2) in vec2 aTexCoords;                           \n"
-            "                                                                    \n"
-            "out vec3 FragPos;                                                   \n"
-            "out vec3 Normal;                                                    \n"
-            "out vec2 TexCoords;                                                 \n"
-            "                                                                    \n"
-            "uniform mat4 projection;                                            \n"
-            "uniform mat4 view;                                                  \n"
-            "uniform mat4 model;                                                 \n"
-            "                                                                    \n"
-            "void main() {                                                       \n"
-            "    FragPos = vec3(model * vec4(aPos, 1.0));                        \n"
-            "    TexCoords = aTexCoords;                                         \n"
-            "                                                                    \n"
-            "    mat3 normalMatrix = transpose(inverse(mat3(model)));            \n"
-            "    Normal = normalize(normalMatrix * aNormal);                     \n"
-            "                                                                    \n"
-            "    gl_Position = projection * view * model * vec4(aPos, 1.0);      \n"
+            "layout (location = 0) in vec3 aPos;\n"
+            "layout (location = 1) in vec3 aNormal;\n"
+            "layout (location = 2) in vec2 aTexCoords;\n"
+            "\n"
+            "out vec3 FragPos;\n"
+            "out vec2 TexCoords;\n"
+            "out vec3 Normal;\n"
+            "\n"
+            "uniform mat4 model;\n"
+            "uniform mat4 view;\n"
+            "uniform mat4 projection;\n"
+            "\n"
+            "void main()\n"
+            "{\n"
+            "    vec4 worldPos = model * vec4(aPos, 1.0);\n"
+            "    FragPos = worldPos.xyz; \n"
+            "    TexCoords = aTexCoords;\n"
+            "    \n"
+            "    mat3 normalMatrix = transpose(inverse(mat3(model)));\n"
+            "    Normal = normalMatrix * aNormal;\n"
+            "\n"
+            "    gl_Position = projection * view * worldPos;\n"
             "}";
-
-    char fBloomShaderStr[] =
+    char gBufferFS[] =
             "#version 300 es                                                     \n"
-            "layout(location = 0) out vec4 FragColor;                            \n"
-            "layout(location = 1) out vec4 BrightColor;                          \n"
-            "                                                                    \n"
-            "in vec3 FragPos;                                                    \n"
-            "in vec3 Normal;                                                     \n"
-            "in vec2 TexCoords;                                                  \n"
-            "                                                                    \n"
-            "struct Light {                                                      \n"
-            "    vec3 Position;                                                  \n"
-            "    vec3 Color;                                                     \n"
-            "};                                                                  \n"
-            "                                                                    \n"
-            "uniform Light lights[4];                                            \n"
-            "uniform sampler2D diffuseTexture;                                   \n"
-            "uniform vec3 viewPos;                                               \n"
-            "                                                                    \n"
-            "void main() {                                                       \n"
-            "    vec3 color = texture(diffuseTexture, TexCoords).rgb;            \n"
-            "    vec3 normal = normalize(Normal);                                \n"
-            "    // ambient                                                      \n"
-            "    vec3 ambient = 0.0 * color;                                     \n"
-            "    // lighting                                                     \n"
-            "    vec3 lighting = vec3(0.0);                                      \n"
-            "    for(int i = 0; i < 4; i++) {                                    \n"
-            "        // diffuse                                                  \n"
-            "        vec3 lightDir = normalize(lights[i].Position - FragPos);    \n"
-            "        float diff = max(dot(lightDir, normal), 0.0);               \n"
-            "        vec3 diffuse = lights[i].Color * diff * color;              \n"
-            "        vec3 result = diffuse;                                      \n"
-            "        // attenuation (use quadratic as we have gamma correction)  \n"
-            "        float distance = length(FragPos - lights[i].Position);      \n"
-            "        result *= 1.0 / (distance * distance);                      \n"
-            "        lighting += result;                                         \n"
-            "    }                                                               \n"
-            "    vec3 result = ambient + lighting;                               \n"
-            "    // check whether result is higher than some threshold, if so,   \n"
-            "    // output as bloom threshold color                              \n"
-            "    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));   \n"
-            "    if (brightness > 1.0) {                                         \n"
-            "        BrightColor = vec4(result, 1.0);                            \n"
-            "    } else {                                                        \n"
-            "        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);                     \n"
-            "    }                                                               \n"
-            "    FragColor = vec4(result, 1.0);                                  \n"
+            "layout (location = 0) out vec3 gPosition;\n"
+            "layout (location = 1) out vec3 gNormal;\n"
+            "layout (location = 2) out vec4 gAlbedoSpec;\n"
+            "\n"
+            "in vec2 TexCoords;\n"
+            "in vec3 FragPos;\n"
+            "in vec3 Normal;\n"
+            "\n"
+            "uniform sampler2D texture_diffuse1;\n"
+            "uniform sampler2D texture_specular1;\n"
+            "\n"
+            "void main()\n"
+            "{    \n"
+            "    // store the fragment position vector in the first gbuffer texture\n"
+            "    gPosition = FragPos;\n"
+            "    // also store the per-fragment normals into the gbuffer\n"
+            "    gNormal = normalize(Normal);\n"
+            "    // and the diffuse per-fragment color\n"
+            "    gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;\n"
+            "    // store specular intensity in gAlbedoSpec's alpha component\n"
+            "    gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;\n"
             "}";
-    char fLightBoxShaderStr[] =
-            "#version 300 es                                                     \n"
-            "layout (location = 0) out vec4 FragColor;                           \n"
-            "layout (location = 1) out vec4 BrightColor;                         \n"
-            "                                                                    \n"
-            "uniform vec3 lightColor;                                            \n"
-            "                                                                    \n"
-            "void main() {                                                       \n"
-            "    FragColor = vec4(lightColor, 1.0);                              \n"
-            "    vec3 factor = vec3(0.2126, 0.7152, 0.0722);                     \n"
-            "    float brightness = dot(FragColor.rgb, factor);                  \n"
-            "    if(brightness > 1.0) {                                          \n"
-            "        BrightColor = vec4(FragColor.rgb, 1.0);                     \n"
-            "    } else {                                                        \n"
-            "        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);                     \n"
-            "    }                                                               \n"
-            "}";
-    char vBlurShaderStr[] =
-            "#version 300 es                                                     \n"
-            "layout (location = 0) in vec3 aPos;                                 \n"
-            "layout (location = 1) in vec2 aTexCoords;                           \n"
-            "                                                                    \n"
-            "out vec2 TexCoords;                                                 \n"
-            "                                                                    \n"
-            "void main() {                                                       \n"
-            "    TexCoords = aTexCoords;                                         \n"
-            "    gl_Position = vec4(aPos, 1.0);                                  \n"
-            "}";
-    char fBlurShaderStr[] =
-            "#version 300 es                                                     \n"
-            "out vec4 FragColor;                                                 \n"
-            "                                                                    \n"
-            "in vec2 TexCoords;                                                  \n"
-            "                                                                    \n"
-            "uniform sampler2D image;                                            \n"
-            "                                                                    \n"
-            "uniform bool horizontal;                                            \n"
-            "float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);   \n"
-            "                                                                                                    \n"
-            "void main() {                                                                                       \n"
-            "    ivec2 size = textureSize(image, 0);                                                             \n"
-            "    vec2 tex_offset = vec2(1.0 / float(size.x), 1.0 / float(size.y));//gets size of single texel    \n"
-            "    vec3 result = texture(image, TexCoords).rgb * weight[0];                                        \n"
-            "    if(horizontal) {                                                                                \n"
-            "        for(int i = 1; i < 5; ++i) {                                                                \n"
-            "            float index = float(1.0);                                                               \n"
-            "            result += texture(image, TexCoords + vec2(tex_offset.x * index, 0.0)).rgb * weight[i];  \n"
-            "            result += texture(image, TexCoords - vec2(tex_offset.x * index, 0.0)).rgb * weight[i];  \n"
-            "        }                                                                                           \n"
-            "    } else {                                                                                        \n"
-            "        for(int i = 1; i < 5; ++i) {                                                                \n"
-            "            float index = float(1.0);                                                               \n"
-            "            result += texture(image, TexCoords + vec2(0.0, tex_offset.y * index)).rgb * weight[i];  \n"
-            "            result += texture(image, TexCoords - vec2(0.0, tex_offset.y * index)).rgb * weight[i];  \n"
-            "        }                                                                                           \n"
-            "    }                                                                                               \n"
-            "    FragColor = vec4(result, 1.0);                                                                  \n"
-            "}";
-    char vBloomFinalShaderStr[] =
+    char vDeferredShadingStr[] =
             "#version 300 es                                                \n"
-            "layout (location = 0) in vec3 aPos;                            \n"
-            "layout (location = 1) in vec2 aTexCoords;                      \n"
-            "                                                               \n"
-            "out vec2 TexCoords;                                            \n"
-            "                                                               \n"
-            "void main() {                                                  \n"
-            "    TexCoords = aTexCoords;                                    \n"
-            "    gl_Position = vec4(aPos, 1.0);                             \n"
+            "layout (location = 0) in vec3 aPos;\n"
+            "layout (location = 1) in vec2 aTexCoords;\n"
+            "\n"
+            "out vec2 TexCoords;\n"
+            "\n"
+            "void main()\n"
+            "{\n"
+            "    TexCoords = aTexCoords;\n"
+            "    gl_Position = vec4(aPos, 1.0);\n"
             "}";
-    char fBloomFinalShaderStr[] =
+    char fDeferredShadingStr[] =
             "#version 300 es                                               \n"
-            "out vec4 FragColor;                                           \n"
-            "                                                              \n"
-            "in vec2 TexCoords;                                            \n"
-            "                                                              \n"
-            "uniform sampler2D scene;                                      \n"
-            "uniform sampler2D bloomBlur;                                  \n"
-            "uniform bool bloom;                                           \n"
-            "uniform float exposure;                                       \n"
-            "                                                              \n"
-            "void main() {                                                 \n"
-            "    const float gamma = 2.2;                                  \n"
-            "    vec3 hdrColor = texture(scene, TexCoords).rgb;            \n"
-            "    vec3 bloomColor = texture(bloomBlur, TexCoords).rgb;      \n"
-            "    if(bloom) {                                               \n"
-            "        hdrColor += bloomColor; // additive blending          \n"
-            "    }                                                         \n"
-            "    // tone mapping                                           \n"
-            "    // 1. reinhard                                            \n"
-            "    // vec3 result = hdrColor / (hdrColor + vec3(1.0));       \n"
-            "    // exposure                                               \n"
-            "    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);      \n"
-            "    // 2. also gamma correct while we're at it                \n"
-            "    result = pow(result, vec3(1.0 / gamma));                  \n"
-            "    FragColor = vec4(result, 1.0);                            \n"
+            "out vec4 FragColor;\n"
+            "\n"
+            "in vec2 TexCoords;\n"
+            "\n"
+            "uniform sampler2D gPosition;\n"
+            "uniform sampler2D gNormal;\n"
+            "uniform sampler2D gAlbedoSpec;\n"
+            "\n"
+            "struct Light {\n"
+            "    vec3 Position;\n"
+            "    vec3 Color;\n"
+            "    \n"
+            "    float Linear;\n"
+            "    float Quadratic;\n"
+            "};\n"
+            "const int NR_LIGHTS = 32;\n"
+            "uniform Light lights[NR_LIGHTS];\n"
+            "uniform vec3 viewPos;\n"
+            "\n"
+            "void main()\n"
+            "{             \n"
+            "    // retrieve data from gbuffer\n"
+            "    vec3 FragPos = texture(gPosition, TexCoords).rgb;\n"
+            "    vec3 Normal = texture(gNormal, TexCoords).rgb;\n"
+            "    vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;\n"
+            "    float Specular = texture(gAlbedoSpec, TexCoords).a;\n"
+            "    \n"
+            "    // then calculate lighting as usual\n"
+            "    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component\n"
+            "    vec3 viewDir  = normalize(viewPos - FragPos);\n"
+            "    for(int i = 0; i < NR_LIGHTS; ++i)\n"
+            "    {\n"
+            "        // diffuse\n"
+            "        vec3 lightDir = normalize(lights[i].Position - FragPos);\n"
+            "        vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;\n"
+            "        // specular\n"
+            "        vec3 halfwayDir = normalize(lightDir + viewDir);  \n"
+            "        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);\n"
+            "        vec3 specular = lights[i].Color * spec * Specular;\n"
+            "        // attenuation\n"
+            "        float distance = length(lights[i].Position - FragPos);\n"
+            "        float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);\n"
+            "        diffuse *= attenuation;\n"
+            "        specular *= attenuation;\n"
+            "        lighting += diffuse + specular;        \n"
+            "    }\n"
+            "    FragColor = vec4(lighting, 1.0);\n"
             "}";
 
-    LOGE("----debug----: 1 shader ");
-    shader = Shader(vBloomShaderStr, fBloomShaderStr);
-    LOGE("----debug----: 2 shaderLight");
-    shaderLight = Shader(vBloomShaderStr, fLightBoxShaderStr);
-    LOGE("----debug----: 3 shaderBlur");
-    shaderBlur = Shader(vBlurShaderStr, fBlurShaderStr);
-    LOGE("----debug----: 4 shaderBloomFinal");
-    shaderBloomFinal = Shader(vBloomFinalShaderStr, fBloomFinalShaderStr);
-    if (shader.isAvailable()) {
+    char vLightBoxStr[] =
+            "#version 300 es                                               \n"
+            "layout (location = 0) in vec3 aPos;\n"
+            "layout (location = 1) in vec3 aNormal;\n"
+            "layout (location = 2) in vec2 aTexCoords;\n"
+            "\n"
+            "uniform mat4 projection;\n"
+            "uniform mat4 view;\n"
+            "uniform mat4 model;\n"
+            "\n"
+            "void main()\n"
+            "{\n"
+            "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+            "}";
+    char fLightBoxStr[] =
+            "#version 300 es                                               \n"
+            "layout (location = 0) out vec4 FragColor;\n"
+            "\n"
+            "uniform vec3 lightColor;\n"
+            "\n"
+            "void main()\n"
+            "{           \n"
+            "    FragColor = vec4(lightColor, 1.0);\n"
+            "}";
 
-        // Config wood texture
-        glGenTextures(1, &woodTexture);
-        glBindTexture(GL_TEXTURE_2D, woodTexture);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+    // Setup and compile our shaders
+    shaderGeometryPass = AssimpShader(gBufferVS, gBufferFS);
+    shaderLightingPass = AssimpShader(vDeferredShadingStr, fDeferredShadingStr);
+    shaderLightBox = AssimpShader(vLightBoxStr, fLightBoxStr);
 
-        // Config wood texture
-        glGenTextures(1, &containerTexture);
-        glBindTexture(GL_TEXTURE_2D, containerTexture);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, GL_NONE);
+
+
+
+
+
+    if (shaderGeometryPass.isAvailable()) {
+
+        // Set samplers
+        shaderLightingPass.use();
+        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gPosition"), 0);
+        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gNormal"), 1);
+        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gAlbedoSpec"), 2);
+
+        // Models
+        std::string path(DEFAULT_OGL_ASSETS_DIR);
+        backpack = Model(path + "/model/backpack/backpack.obj");
+//        cyborg = Model(path + "/model/chinese_ancient_game_girl_role/scene.gltf");
+        objectPositions.push_back(glm::vec3(-3.0,  -0.5, -3.0));
+        objectPositions.push_back(glm::vec3( 0.0,  -0.5, -3.0));
+        objectPositions.push_back(glm::vec3( 3.0,  -0.5, -3.0));
+        objectPositions.push_back(glm::vec3(-3.0,  -0.5,  0.0));
+        objectPositions.push_back(glm::vec3( 0.0,  -0.5,  0.0));
+        objectPositions.push_back(glm::vec3( 3.0,  -0.5,  0.0));
+        objectPositions.push_back(glm::vec3(-3.0,  -0.5,  3.0));
+        objectPositions.push_back(glm::vec3( 0.0,  -0.5,  3.0));
+        objectPositions.push_back(glm::vec3( 3.0,  -0.5,  3.0));
+        // lighting info
+        // -------------
+        const unsigned int NR_LIGHTS = 32;
+        srand(13);
+        for (unsigned int i = 0; i < NR_LIGHTS; i++)
+        {
+            // calculate slightly random offsets
+            float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+            float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
+            float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
+            lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+            // also calculate random color
+            float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+            float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+            float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+            lightColors.push_back(glm::vec3(rColor, gColor, bColor));
+        }
 
         // shader configuration
         // --------------------
-        shader.use();
-        shader.setInt("diffuseTexture", 0);
-        shaderBlur.use();
-        shaderBlur.setInt("image", 0);
-        shaderBloomFinal.use();
-        shaderBloomFinal.setInt("scene", 0);
-        shaderBloomFinal.setInt("bloomBlur", 1);
+        shaderLightingPass.use();
+        shaderLightingPass.setInt("gPosition", 0);
+        shaderLightingPass.setInt("gNormal", 1);
+        shaderLightingPass.setInt("gAlbedoSpec", 2);
     } else {
         LOGE("DeferredShadingSample::Init create program fail");
         return;
     }
 }
 
+/**
+ * RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets and post-processing effects.
+ */
 void DeferredShadingSample::renderQuad() {
     if (quadVAO == 0) {
         float quadVertices[] = {
                 // positions        // texture Coords
                 -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
                 -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+                 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+                 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
         // setup plane VAO
         glGenVertexArrays(1, &quadVAO);
@@ -372,203 +364,137 @@ void DeferredShadingSample::loadMultiImageWithIndex(int index, NativeImage *pIma
     }
 }
 
+void DeferredShadingSample::initGBuffer(int width, int height) {
+    LOGE("DeferredShadingSample::initGBuffer()");
+    // Set up G-Buffer
+    // 3 textures:
+    // 1. Positions (RGB)
+    // 2. Color (RGB) + Specular (A)
+    // 3. Normals (RGB)
+    glGenFramebuffers(1, &gBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    // position color buffer
+    glGenTextures(1, &gPosition);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+    // normal color buffer
+    glGenTextures(1, &gNormal);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+    // color + specular color buffer
+    glGenTextures(1, &gAlbedoSpec);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+    // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
+    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+    // create and attach depth buffer (renderbuffer)
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    // finally check if framebuffer is complete
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
 void DeferredShadingSample::draw(int screenW, int screenH) {
     LOGE("DeferredShadingSample::Draw()");
 
-    if (!shader.isAvailable()) {
+    if (!shaderLightingPass.isAvailable()) {
         LOGE("DeferredShadingSample::Draw() return");
         return;
     }
     if (firstFrame) {
         firstFrame = false;
         glEnable(GL_DEPTH_TEST);
-        // configure (floating point) framebuffers
-        // ---------------------------------------
-        glGenFramebuffers(1, &hdrFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-        // create 2 floating point color buffers (1 for normal rendering, other for brightness threshold values)
-        glGenTextures(2, colorBuffers);
-        for (unsigned int i = 0; i < 2; i++) {
-            glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenW, screenH, 0, GL_RGBA, GL_FLOAT, NULL);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            // attach texture to framebuffer
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
-        }
-        // create and attach depth buffer (render buffer)
-        glGenRenderbuffers(1, &rboDepth);
-        glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenW, screenH);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-        // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
-        GLenum attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-        glDrawBuffers(2, attachments);
-        // finally check if framebuffer is complete
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            LOGE("Framebuffer not complete!");
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // ping-pong-framebuffer for blurring
-        glGenFramebuffers(2, pingpongFBO);
-        glGenTextures(2, pingpongColorBuffers);
-        for (unsigned int i = 0; i < 2; i++) {
-            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-            glBindTexture(GL_TEXTURE_2D, pingpongColorBuffers[i]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, screenW, screenH, 0, GL_RGBA, GL_FLOAT, NULL);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorBuffers[i], 0);
-            // also check if frame buffers are complete (no need for depth buffer)
-            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-                LOGE("Framebuffer not complete!");
-            }
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
+        initGBuffer(screenW, screenH);
     }
-    // render
-    // ------
     UpdateMVPMatrix(mvpMatrix, m_AngleX, m_AngleY, (float) screenW / (float) screenH);
-
-    // lighting info
-    // -------------
-    // positions
-    std::vector<glm::vec3> lightPositions;
-    lightPositions.emplace_back(glm::vec3( 0.0f, 0.5f,  1.5f));
-    lightPositions.emplace_back(glm::vec3(-4.0f, 0.5f, -3.0f));
-    lightPositions.emplace_back(glm::vec3( 3.0f, 0.5f,  1.0f));
-    lightPositions.emplace_back(glm::vec3(-.8f,  2.4f, -1.0f));
-    // colors
-    std::vector<glm::vec3> lightColors;
-    lightColors.emplace_back(glm::vec3(5.0f,   5.0f,  5.0f));
-    lightColors.emplace_back(glm::vec3(10.0f,  0.0f,  0.0f));
-    lightColors.emplace_back(glm::vec3(0.0f,   0.0f,  15.0f));
-    lightColors.emplace_back(glm::vec3(0.0f,   5.0f,  0.0f));
-
     // render
     // ------
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-    // 1. render scene into floating point framebuffer
-    // -----------------------------------------------
-    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    // 1. geometry pass: render scene's geometry/color data into gbuffer
+    // -----------------------------------------------------------------
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shader.use();
-    shader.setMat4("projection", projection);
-    shader.setMat4("view", view);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, woodTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, woodImage.width, woodImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, woodImage.ppPlane[0]);
-    // set lighting uniforms
-    for (unsigned int i = 0; i < lightPositions.size(); i++) {
-        shader.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
-        shader.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
-    }
-    shader.setVec3("viewPos", eyePosition);
-    // create one large cube that acts as the floor
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0));
-    model = glm::scale(model, glm::vec3(12.5f, 0.5f, 12.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    // then create multiple cubes as the scenery
-    glBindTexture(GL_TEXTURE_2D, containerTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, containerImage.width, containerImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, containerImage.ppPlane[0]);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 2.0));
-    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 2.7f, 4.0));
-    model = glm::rotate(model, glm::radians(23.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    model = glm::scale(model, glm::vec3(1.25));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-2.0f, 1.0f, -3.0));
-    model = glm::rotate(model, glm::radians(124.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-3.0f, 0.0f, 0.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube();
-
-    // finally show all the light sources as bright cubes
-    shaderLight.use();
-    shaderLight.setMat4("projection", projection);
-    shaderLight.setMat4("view", view);
-
-    for (unsigned int i = 0; i < lightPositions.size(); i++) {
+//    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+//    glm::mat4 view = camera.GetViewMatrix();
+//    glm::mat4 model = glm::mat4(1.0f);
+    shaderGeometryPass.use();
+    shaderGeometryPass.setMat4("projection", projection);
+    shaderGeometryPass.setMat4("view", view);
+    for (unsigned int i = 0; i < objectPositions.size(); i++)
+    {
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(lightPositions[i]));
-        model = glm::scale(model, glm::vec3(0.25f));
-        shaderLight.setMat4("model", model);
-        shaderLight.setVec3("lightColor", lightColors[i]);
+        model = glm::translate(model, objectPositions[i]);
+        model = glm::scale(model, glm::vec3(0.5f));
+        shaderGeometryPass.setMat4("model", model);
+        backpack.Draw(shaderGeometryPass);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
+    // -----------------------------------------------------------------------------------------------------------------------
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shaderLightingPass.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+    // send light relevant uniforms
+    for (unsigned int i = 0; i < lightPositions.size(); i++)
+    {
+        shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+        shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+        // update attenuation parameters and calculate radius
+        const float linear = 0.7f;
+        const float quadratic = 1.8f;
+        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
+        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
+    }
+    shaderLightingPass.setVec3("viewPos", eyePosition);
+    // finally render quad
+    renderQuad();
+
+    // 2.5. copy content of geometry's depth buffer to default framebuffer's depth buffer
+    // ----------------------------------------------------------------------------------
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+    // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
+    // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the
+    // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
+    glBlitFramebuffer(0, 0, screenW, screenH, 0, 0, screenW, screenH, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 3. render lights on top of scene
+    // --------------------------------
+    shaderLightBox.use();
+    shaderLightBox.setMat4("projection", projection);
+    shaderLightBox.setMat4("view", view);
+    for (unsigned int i = 0; i < lightPositions.size(); i++)
+    {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPositions[i]);
+        model = glm::scale(model, glm::vec3(0.125f));
+        shaderLightBox.setMat4("model", model);
+        shaderLightBox.setVec3("lightColor", lightColors[i]);
         renderCube();
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
-
-    // 2. blur bright fragments with two-pass Gaussian Blur
-    // --------------------------------------------------
-    bool horizontal = true, firstIteration = true;
-    unsigned int amount = 10;
-    unsigned int pingpongColorBufferIndex;
-    shaderBlur.use();
-    for (unsigned int i = 0; i < amount; i++) {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-        shaderBlur.setInt("horizontal", horizontal);
-        // bind texture of other framebuffer (or scene if first iteration)
-        pingpongColorBufferIndex = (unsigned int) !horizontal;
-        LOGE("DeferredShadingSample::draw.......pingpongColorBuffers index = %d", pingpongColorBufferIndex);
-        glBindTexture(GL_TEXTURE_2D, firstIteration ? colorBuffers[1] : pingpongColorBuffers[pingpongColorBufferIndex]);
-        renderQuad();
-        horizontal = !horizontal;
-        if (firstIteration) {
-            firstIteration = false;
-        }
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
-
-    // 3. now render floating point color buffer to 2D quad and tone map HDR colors
-    // to default frame buffer's (clamped) color range
-    // --------------------------------------------------------------------------------------------------------------------------
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shaderBloomFinal.use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, pingpongColorBuffers[!horizontal]);
-    shaderBloomFinal.setBool("bloom", true);
-    shaderBloomFinal.setFloat("exposure", 5.0);
-    renderQuad();
 }
 
 void DeferredShadingSample::changeStatus(int type, int flag) {
@@ -578,11 +504,9 @@ void DeferredShadingSample::changeStatus(int type, int flag) {
 
 
 void DeferredShadingSample::destroy() {
-    if (shader.isAvailable()) {
-        shader.deleteProgram();
-        shaderLight.deleteProgram();
-
-        glDeleteTextures(1, &woodTexture);
+    if (shaderLightingPass.isAvailable()) {
+        shaderLightingPass.deleteProgram();
+        shaderGeometryPass.deleteProgram();
     }
 }
 
@@ -604,9 +528,9 @@ void DeferredShadingSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, in
     auto radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
     auto radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
-    float r = 15.0;
-    float lightX = r * sin(radiansY);
-    float lightZ = r * cos(radiansY);
+    float r = 8.0;
+    float lightX = r * cos(radiansY);
+    float lightZ = r * sin(radiansY);
     LOGE("DeferredShadingSample, lightX = %f, lightZ = %f", lightX, lightZ);
     //lightPos = glm::vec3(lightX, 3.0f, lightZ);//1.5f, 2.0f, 3.0f
     model = glm::mat4(1.0f);
@@ -614,7 +538,7 @@ void DeferredShadingSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, in
     model = glm::rotate(model, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
 
     // View matrix
-    eyePosition = glm::vec3 (lightX, 8.0f,  lightZ);
+    eyePosition = glm::vec3 (lightX, 2,  lightZ);
     glm::vec3 center = glm::vec3 (0, 0, 0);
     glm::vec3 upHeader = glm::vec3 (0, 1, 0);
     view = glm::lookAt(

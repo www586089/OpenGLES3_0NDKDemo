@@ -34,7 +34,7 @@ public:
     glm::vec3 maxXyz, minXyz;
     bool gammaCorrection;
     bool hasTexture;
-
+    Model() {}
     /*  Functions   */
     // constructor, expects a filepath to a 3D model.
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma), hasTexture(false) {

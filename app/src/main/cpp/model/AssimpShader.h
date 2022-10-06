@@ -20,10 +20,24 @@ public:
         DEBUG_LOGE();
         ID = GLUtils::CreateProgram(vertexStr, fragmentStr);
     }
+    AssimpShader() {
+
+    }
 
     ~AssimpShader()
     {
         DEBUG_LOGE();
+    }
+
+    bool isAvailable() {
+        return ID > 0;
+    }
+
+    void deleteProgram() {
+        ID = -1;
+        if (isAvailable()) {
+            GLUtils::DeleteProgram(ID);
+        }
     }
 
     void Destroy()

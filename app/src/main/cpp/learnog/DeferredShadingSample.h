@@ -6,6 +6,8 @@
 #define OPENGLES3_0NDKDEMO_DEFERREDSHADINGSAMPLE_H
 
 #include <ext/matrix_float4x4.hpp>
+#include <vector>
+#include <model.h>
 #include "LightingSampleBase.h"
 #include "ImageDef.h"
 
@@ -27,19 +29,25 @@ public:
     virtual void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
     virtual void changeStatus(int type, int flag);
     void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
+    virtual void initGBuffer(int width, int height);
 
 private:
-    Shader shader;
-    Shader shaderLight;
+    AssimpShader shaderGeometryPass;
+    AssimpShader shaderLightingPass;
+    AssimpShader shaderLightBox;
+    std::vector<glm::vec3> objectPositions;
+    std::vector<glm::vec3> lightPositions;
+    std::vector<glm::vec3> lightColors;
+    Model backpack;
     Shader shaderBlur;
     Shader shaderBloomFinal;
     bool firstFrame = true;
+    GLuint gBuffer, gPosition, gNormal, gAlbedoSpec, rboDepth;
     GLuint woodTexture = -1, containerTexture = -1;
     GLuint quadVAO = 0, quadVBO = 0;
     GLuint cubeVAO = 0, cubeVBO = 0;
 
     GLuint hdrFBO = 0;
-    GLuint rboDepth = 0;
     GLuint colorBuffers[2] = {0};
 
     GLuint pingpongFBO[2] = {0};
