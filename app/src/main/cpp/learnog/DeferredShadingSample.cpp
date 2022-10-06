@@ -50,139 +50,132 @@ void DeferredShadingSample::init() {
     }
     char gBufferVS[] =
             "#version 300 es                                                     \n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "layout (location = 1) in vec3 aNormal;\n"
-            "layout (location = 2) in vec2 aTexCoords;\n"
-            "\n"
-            "out vec3 FragPos;\n"
-            "out vec2 TexCoords;\n"
-            "out vec3 Normal;\n"
-            "\n"
-            "uniform mat4 model;\n"
-            "uniform mat4 view;\n"
-            "uniform mat4 projection;\n"
-            "\n"
-            "void main()\n"
-            "{\n"
-            "    vec4 worldPos = model * vec4(aPos, 1.0);\n"
-            "    FragPos = worldPos.xyz; \n"
-            "    TexCoords = aTexCoords;\n"
-            "    \n"
+            "layout (location = 0) in vec3 aPos;            \n"
+            "layout (location = 1) in vec3 aNormal;         \n"
+            "layout (location = 2) in vec2 aTexCoords;      \n"
+            "                                               \n"
+            "out vec3 FragPos;                              \n"
+            "out vec2 TexCoords;                            \n"
+            "out vec3 Normal;                               \n"
+            "                                               \n"
+            "uniform mat4 model;                            \n"
+            "uniform mat4 view;                             \n"
+            "uniform mat4 projection;                       \n"
+            "                                               \n"
+            "void main() {                                  \n"
+            "    vec4 worldPos = model * vec4(aPos, 1.0);   \n"
+            "    FragPos = worldPos.xyz;                    \n"
+            "    TexCoords = aTexCoords;                    \n"
+            "                                               \n"
             "    mat3 normalMatrix = transpose(inverse(mat3(model)));\n"
-            "    Normal = normalMatrix * aNormal;\n"
-            "\n"
-            "    gl_Position = projection * view * worldPos;\n"
+            "    Normal = normalMatrix * aNormal;                    \n"
+            "                                                        \n"
+            "    gl_Position = projection * view * worldPos;         \n"
             "}";
     char gBufferFS[] =
             "#version 300 es                                                     \n"
-            "layout (location = 0) out vec3 gPosition;\n"
-            "layout (location = 1) out vec3 gNormal;\n"
-            "layout (location = 2) out vec4 gAlbedoSpec;\n"
-            "\n"
-            "in vec2 TexCoords;\n"
-            "in vec3 FragPos;\n"
-            "in vec3 Normal;\n"
-            "\n"
-            "uniform sampler2D texture_diffuse1;\n"
-            "uniform sampler2D texture_specular1;\n"
-            "\n"
-            "void main()\n"
-            "{    \n"
-            "    // store the fragment position vector in the first gbuffer texture\n"
-            "    gPosition = FragPos;\n"
-            "    // also store the per-fragment normals into the gbuffer\n"
-            "    gNormal = normalize(Normal);\n"
-            "    // and the diffuse per-fragment color\n"
-            "    gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;\n"
-            "    // store specular intensity in gAlbedoSpec's alpha component\n"
-            "    gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;\n"
+            "layout (location = 0) out vec3 gPosition;            \n"
+            "layout (location = 1) out vec3 gNormal;              \n"
+            "layout (location = 2) out vec4 gAlbedoSpec;          \n"
+            "                                                     \n"
+            "in vec2 TexCoords;                                   \n"
+            "in vec3 FragPos;                                     \n"
+            "in vec3 Normal;                                      \n"
+            "                                                     \n"
+            "uniform sampler2D texture_diffuse1;                  \n"
+            "uniform sampler2D texture_specular1;                 \n"
+            "                                                     \n"
+            "void main() {                                                            \n"
+            "    // store the fragment position vector in the first gbuffer texture   \n"
+            "    gPosition = FragPos;                                                 \n"
+            "    // also store the per-fragment normals into the gbuffer              \n"
+            "    gNormal = normalize(Normal);                                         \n"
+            "    // and the diffuse per-fragment color                                \n"
+            "    gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;          \n"
+            "    // store specular intensity in gAlbedoSpec's alpha component         \n"
+            "    gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;             \n"
             "}";
     char vDeferredShadingStr[] =
             "#version 300 es                                                \n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "layout (location = 1) in vec2 aTexCoords;\n"
-            "\n"
-            "out vec2 TexCoords;\n"
-            "\n"
-            "void main()\n"
-            "{\n"
-            "    TexCoords = aTexCoords;\n"
-            "    gl_Position = vec4(aPos, 1.0);\n"
+            "layout (location = 0) in vec3 aPos;                            \n"
+            "layout (location = 1) in vec2 aTexCoords;                      \n"
+            "                                                               \n"
+            "out vec2 TexCoords;                                            \n"
+            "                                                               \n"
+            "void main() {                                                  \n"
+            "    TexCoords = aTexCoords;                                    \n"
+            "    gl_Position = vec4(aPos, 1.0);                             \n"
             "}";
     char fDeferredShadingStr[] =
-            "#version 300 es                                               \n"
-            "out vec4 FragColor;\n"
-            "\n"
-            "in vec2 TexCoords;\n"
-            "\n"
-            "uniform sampler2D gPosition;\n"
-            "uniform sampler2D gNormal;\n"
-            "uniform sampler2D gAlbedoSpec;\n"
-            "\n"
-            "struct Light {\n"
-            "    vec3 Position;\n"
-            "    vec3 Color;\n"
-            "    \n"
-            "    float Linear;\n"
-            "    float Quadratic;\n"
-            "};\n"
-            "const int NR_LIGHTS = 32;\n"
-            "uniform Light lights[NR_LIGHTS];\n"
-            "uniform vec3 viewPos;\n"
-            "\n"
-            "void main()\n"
-            "{             \n"
-            "    // retrieve data from gbuffer\n"
-            "    vec3 FragPos = texture(gPosition, TexCoords).rgb;\n"
-            "    vec3 Normal = texture(gNormal, TexCoords).rgb;\n"
-            "    vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;\n"
-            "    float Specular = texture(gAlbedoSpec, TexCoords).a;\n"
-            "    \n"
-            "    // then calculate lighting as usual\n"
-            "    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component\n"
-            "    vec3 viewDir  = normalize(viewPos - FragPos);\n"
-            "    for(int i = 0; i < NR_LIGHTS; ++i)\n"
-            "    {\n"
-            "        // diffuse\n"
-            "        vec3 lightDir = normalize(lights[i].Position - FragPos);\n"
-            "        vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;\n"
-            "        // specular\n"
-            "        vec3 halfwayDir = normalize(lightDir + viewDir);  \n"
-            "        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);\n"
-            "        vec3 specular = lights[i].Color * spec * Specular;\n"
-            "        // attenuation\n"
-            "        float distance = length(lights[i].Position - FragPos);\n"
+            "#version 300 es                                                \n"
+            "out vec4 FragColor;                                            \n"
+            "                                                               \n"
+            "in vec2 TexCoords;                                             \n"
+            "                                                               \n"
+            "uniform sampler2D gPosition;                                   \n"
+            "uniform sampler2D gNormal;                                     \n"
+            "uniform sampler2D gAlbedoSpec;                                 \n"
+            "                                                               \n"
+            "struct Light {                                                 \n"
+            "    vec3 Position;                                             \n"
+            "    vec3 Color;                                                \n"
+            "                                                               \n"
+            "    float Linear;                                              \n"
+            "    float Quadratic;                                           \n"
+            "};                                                             \n"
+            "const int NR_LIGHTS = 32;                                      \n"
+            "uniform Light lights[NR_LIGHTS];                               \n"
+            "uniform vec3 viewPos;                                          \n"
+            "                                                               \n"
+            "void main() {                                                  \n"
+            "    // retrieve data from gbuffer                              \n"
+            "    vec3 FragPos = texture(gPosition, TexCoords).rgb;          \n"
+            "    vec3 Normal = texture(gNormal, TexCoords).rgb;             \n"
+            "    vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;        \n"
+            "    float Specular = texture(gAlbedoSpec, TexCoords).a;        \n"
+            "                                                               \n"
+            "    // then calculate lighting as usual                        \n"
+            "    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component                     \n"
+            "    vec3 viewDir  = normalize(viewPos - FragPos);                                       \n"
+            "    for(int i = 0; i < NR_LIGHTS; ++i) {                                                \n"
+            "        // diffuse                                                                      \n"
+            "        vec3 lightDir = normalize(lights[i].Position - FragPos);                        \n"
+            "        vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;     \n"
+            "        // specular                                                                     \n"
+            "        vec3 halfwayDir = normalize(lightDir + viewDir);                                \n"
+            "        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);                      \n"
+            "        vec3 specular = lights[i].Color * spec * Specular;                              \n"
+            "        // attenuation                                                                  \n"
+            "        float distance = length(lights[i].Position - FragPos);                          \n"
             "        float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);\n"
-            "        diffuse *= attenuation;\n"
-            "        specular *= attenuation;\n"
-            "        lighting += diffuse + specular;        \n"
-            "    }\n"
-            "    FragColor = vec4(lighting, 1.0);\n"
+            "        diffuse *= attenuation;                                                         \n"
+            "        specular *= attenuation;                                                        \n"
+            "        lighting += diffuse + specular;                                                 \n"
+            "    }                                                                                   \n"
+            "    FragColor = vec4(lighting, 1.0);                                                    \n"
             "}";
 
     char vLightBoxStr[] =
             "#version 300 es                                               \n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "layout (location = 1) in vec3 aNormal;\n"
-            "layout (location = 2) in vec2 aTexCoords;\n"
-            "\n"
-            "uniform mat4 projection;\n"
-            "uniform mat4 view;\n"
-            "uniform mat4 model;\n"
-            "\n"
-            "void main()\n"
-            "{\n"
+            "layout (location = 0) in vec3 aPos;                           \n"
+            "layout (location = 1) in vec3 aNormal;                        \n"
+            "layout (location = 2) in vec2 aTexCoords;                     \n"
+            "                                                              \n"
+            "uniform mat4 projection;                                      \n"
+            "uniform mat4 view;                                            \n"
+            "uniform mat4 model;                                           \n"
+            "                                                              \n"
+            "void main() {                                                 \n"
             "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
             "}";
     char fLightBoxStr[] =
             "#version 300 es                                               \n"
-            "layout (location = 0) out vec4 FragColor;\n"
-            "\n"
-            "uniform vec3 lightColor;\n"
-            "\n"
-            "void main()\n"
-            "{           \n"
-            "    FragColor = vec4(lightColor, 1.0);\n"
+            "layout (location = 0) out vec4 FragColor;                     \n"
+            "                                                              \n"
+            "uniform vec3 lightColor;                                      \n"
+            "                                                              \n"
+            "void main() {                                                 \n"
+            "    FragColor = vec4(lightColor, 1.0);                        \n"
             "}";
 
     // Setup and compile our shaders
@@ -190,19 +183,7 @@ void DeferredShadingSample::init() {
     shaderLightingPass = AssimpShader(vDeferredShadingStr, fDeferredShadingStr);
     shaderLightBox = AssimpShader(vLightBoxStr, fLightBoxStr);
 
-
-
-
-
-
     if (shaderGeometryPass.isAvailable()) {
-
-        // Set samplers
-        shaderLightingPass.use();
-        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gPosition"), 0);
-        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gNormal"), 1);
-        glUniform1i(glGetUniformLocation(shaderLightingPass.ID, "gAlbedoSpec"), 2);
-
         // Models
         std::string path(DEFAULT_OGL_ASSETS_DIR);
         backpack = Model(path + "/model/backpack/backpack.obj");
@@ -220,8 +201,7 @@ void DeferredShadingSample::init() {
         // -------------
         const unsigned int NR_LIGHTS = 32;
         srand(13);
-        for (unsigned int i = 0; i < NR_LIGHTS; i++)
-        {
+        for (unsigned int i = 0; i < NR_LIGHTS; i++) {
             // calculate slightly random offsets
             float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
             float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
@@ -231,6 +211,7 @@ void DeferredShadingSample::init() {
             float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
             float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
             float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5); // between 0.5 and 1.0
+            LOGE("DeferredShadingSample Light[%d] = (%f, %f, %f)", i, rColor, gColor, bColor);
             lightColors.push_back(glm::vec3(rColor, gColor, bColor));
         }
 
@@ -281,16 +262,16 @@ void DeferredShadingSample::renderCube() {
                 {
                         // back face
                         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-                        1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // top-right
-                        1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
-                        1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                         1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // top-right
+                         1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+                         1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // top-right
                         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
                         -1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, // top-left
                         // front face
                         -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-                        1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-                        1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f, // top-right
-                        1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                         1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+                         1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f, // top-right
+                         1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f, // top-right
                         -1.0f,  1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 0.0f, 1.0f, // top-left
                         -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
                         // left face
@@ -301,24 +282,24 @@ void DeferredShadingSample::renderCube() {
                         -1.0f, -1.0f,  1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
                         -1.0f,  1.0f,  1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // top-right
                         // right face
-                        1.0f,  1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // top-left
-                        1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-                        1.0f,  1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 1.0f, // top-right
-                        1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-                        1.0f,  1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // top-left
-                        1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+                         1.0f,  1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                         1.0f,  1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 1.0f, // top-right
+                         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+                         1.0f,  1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f, // top-left
+                         1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
                         // bottom face
                         -1.0f, -1.0f, -1.0f,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
-                        1.0f, -1.0f, -1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, // top-left
-                        1.0f, -1.0f,  1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom-left
-                        1.0f, -1.0f,  1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom-left
+                         1.0f, -1.0f, -1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, // top-left
+                         1.0f, -1.0f,  1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom-left
+                         1.0f, -1.0f,  1.0f,  0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom-left
                         -1.0f, -1.0f,  1.0f,  0.0f, -1.0f, 0.0f, 0.0f, 0.0f, // bottom-right
                         -1.0f, -1.0f, -1.0f,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
                         // top face
                         -1.0f,  1.0f, -1.0f,  0.0f,  1.0f, 0.0f, 0.0f, 1.0f, // top-left
-                        1.0f,  1.0f,  1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
-                        1.0f,  1.0f, -1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 1.0f, // top-right
-                        1.0f,  1.0f,  1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
+                         1.0f,  1.0f,  1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
+                         1.0f,  1.0f, -1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 1.0f, // top-right
+                         1.0f,  1.0f,  1.0f,  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, // bottom-right
                         -1.0f,  1.0f, -1.0f,  0.0f,  1.0f, 0.0f, 0.0f, 1.0f, // top-left
                         -1.0f,  1.0f,  1.0f,  0.0f,  1.0f, 0.0f, 0.0f, 0.0f  // bottom-left
                 };
@@ -346,22 +327,10 @@ void DeferredShadingSample::renderCube() {
 
 void DeferredShadingSample::loadImage(NativeImage *pImage) {
     LOGE("DeferredShadingSample::LoadImage pImage = %p", pImage->ppPlane[0]);
-    if (pImage) {
-        woodImage.width = pImage->width;
-        woodImage.height = pImage->height;
-        woodImage.format = pImage->format;
-        NativeImageUtil::CopyNativeImage(pImage, &woodImage);
-    }
 }
 
 void DeferredShadingSample::loadMultiImageWithIndex(int index, NativeImage *pImage) {
     LOGE("DeferredShadingSample::LoadImage pImage = %p", pImage->ppPlane[0]);
-    if (0 == index) {
-        containerImage.width = pImage->width;
-        containerImage.height = pImage->height;
-        containerImage.format = pImage->format;
-        NativeImageUtil::CopyNativeImage(pImage, &containerImage);
-    }
 }
 
 void DeferredShadingSample::initGBuffer(int width, int height) {
@@ -394,18 +363,20 @@ void DeferredShadingSample::initGBuffer(int width, int height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+
     // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
-    // create and attach depth buffer (renderbuffer)
+    // create and attach depth buffer (render buffer)
     glGenRenderbuffers(1, &rboDepth);
     glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
     // finally check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "Framebuffer not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        LOGE("DeferredShadingSample: initGBuffer ---> Framebuffer not complete!");
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 }
 
 void DeferredShadingSample::draw(int screenW, int screenH) {
@@ -430,21 +401,17 @@ void DeferredShadingSample::draw(int screenW, int screenH) {
     // -----------------------------------------------------------------
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-//    glm::mat4 view = camera.GetViewMatrix();
-//    glm::mat4 model = glm::mat4(1.0f);
     shaderGeometryPass.use();
     shaderGeometryPass.setMat4("projection", projection);
     shaderGeometryPass.setMat4("view", view);
-    for (unsigned int i = 0; i < objectPositions.size(); i++)
-    {
+    for (auto & objectPosition : objectPositions) {
         model = glm::mat4(1.0f);
-        model = glm::translate(model, objectPositions[i]);
+        model = glm::translate(model, objectPosition);
         model = glm::scale(model, glm::vec3(0.5f));
         shaderGeometryPass.setMat4("model", model);
         backpack.Draw(shaderGeometryPass);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 
     // 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
     // -----------------------------------------------------------------------------------------------------------------------
@@ -457,8 +424,7 @@ void DeferredShadingSample::draw(int screenW, int screenH) {
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
     // send light relevant uniforms
-    for (unsigned int i = 0; i < lightPositions.size(); i++)
-    {
+    for (unsigned int i = 0; i < lightPositions.size(); i++) {
         shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
         shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
         // update attenuation parameters and calculate radius
@@ -486,8 +452,7 @@ void DeferredShadingSample::draw(int screenW, int screenH) {
     shaderLightBox.use();
     shaderLightBox.setMat4("projection", projection);
     shaderLightBox.setMat4("view", view);
-    for (unsigned int i = 0; i < lightPositions.size(); i++)
-    {
+    for (unsigned int i = 0; i < lightPositions.size(); i++) {
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPositions[i]);
         model = glm::scale(model, glm::vec3(0.125f));
@@ -528,7 +493,7 @@ void DeferredShadingSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, in
     auto radiansX = static_cast<float>(MATH_PI / 180.0f * angleX);
     auto radiansY = static_cast<float>(MATH_PI / 180.0f * angleY);
     projection = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
-    float r = 8.0;
+    float r = 10.0;
     float lightX = r * cos(radiansY);
     float lightZ = r * sin(radiansY);
     LOGE("DeferredShadingSample, lightX = %f, lightZ = %f", lightX, lightZ);

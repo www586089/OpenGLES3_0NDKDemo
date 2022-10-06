@@ -12,7 +12,7 @@
 class AssimpShader
 {
 public:
-    unsigned int ID;
+    unsigned int ID = 0;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     AssimpShader(const char* vertexStr, const char* fragmentStr)
@@ -34,10 +34,10 @@ public:
     }
 
     void deleteProgram() {
-        ID = -1;
         if (isAvailable()) {
             GLUtils::DeleteProgram(ID);
         }
+        ID = -1;
     }
 
     void Destroy()
